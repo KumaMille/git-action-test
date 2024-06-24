@@ -51,7 +51,7 @@ jobs:
         run: ./gradlew assembleGoogleSandboxRelease --stacktrace
 
       - name: action-slack
-        uses: 8398a7/action-slack@v3.8.0
+        uses: 8398a7/action-slack@v3
         with:
             status: ${{ job.status }}
             author_name: 빌드 알림
