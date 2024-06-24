@@ -12,44 +12,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: gradle
+      - uses: actions/checkout@v4
+      - name: set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
       
-    # - name: Create google-services
-    #   run: |
-    #     mkdir ./app/src/release
-    #     echo '${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}' > ./app/src/release/google-services.json
+      # - name: Create google-services
+      #   run: |
+      #     mkdir ./app/src/release
+      #     echo '${{ secrets.GOOGLE_SERVICES_JSON_RELEASE }}' > ./app/src/release/google-services.json
 
-    # - name: Create KeyStore File and Properties
-    #   run: |
-    #     mkdir ./app/signing
-    #     echo '${{ secrets.KU_RING_KEY_STORE_JKS }}' | base64 -d > ./app/signing/ku_ring_keystore.jks
-    #     echo '${{ secrets.KEY_STORE_PROPERTIES }}' > ./app/signing/keystore.properties
+      # - name: Create KeyStore File and Properties
+      #   run: |
+      #     mkdir ./app/signing
+      #     echo '${{ secrets.KU_RING_KEY_STORE_JKS }}' | base64 -d > ./app/signing/ku_ring_keystore.jks
+      #     echo '${{ secrets.KEY_STORE_PROPERTIES }}' > ./app/signing/keystore.properties
 
-    # Build Google Distribution APK Release
-    - name: Build release Apk
-      run: ./gradlew assembleGoogleDistributionRelease --stacktrace
+      # Build Google Distribution APK Release
+      - name: Build release Apk
+        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
 
-    # Build Google Sandbox APK Release
-    - name: Build release Apk
-      run: ./gradlew asassembleGoogleSandboxRelease --stacktrace
-    
-    # Build AAB Release
-    # - name: Build release Bundle
-      # run: ./gradlew bundleRelease
+      # Build Google Sandbox APK Release
+      - name: Build release Apk
+        run: ./gradlew assembleGoogleSandboxRelease --stacktrace
 
-    # Run unit test
-    # - name: Run unit test
-    #   run: ./gradlew testreleaseUnitTest
-      
+        # Build AAB Release
+        # - name: Build release Bundle
+        # run: ./gradlew bundleRelease
+
+        # Run unit test
+        # - name: Run unit test
+        #   run: ./gradlew testreleaseUnitTest
+
     # Upload AAB
     # - name: Upload a Build AAB Artifact
     #   uses: actions/upload-artifact@v3.0.0
