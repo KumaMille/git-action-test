@@ -37,18 +37,33 @@ jobs:
       - name: Clean Gradle
         run: ./gradlew clean
 
+#      - name: Build with Gradle
+#        run: ./gradlew build
+
+      - name: Get Current Date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
       - name: Build Google Distribution release Apk
         run: ./gradlew assembleGoogleDistributionRelease --stacktrace
 
       - name: Build Google Sandbox release Apk
         run: ./gradlew assembleGoogleSandboxRelease --stacktrace
 
-      - name: Send Build Status Slack Msg
-        uses: 8398a7/action-slack@v3
+      - name: action-slack
+        uses: 8398a7/action-slack@v3.8.0
         with:
-          status: ${{ job.status }}
-          fields: workflow,job,commit,repo,author,took,ref
-          author_name: Kuma
+            status: ${{ job.status }}
+            author_name: 빌드 알림
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        if: always()
+                SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+#      - name: Send Build Status Slack Msg
+#        uses: 8398a7/action-slack@v3
+#        with:
+#          status: ${{ job.status }}
+#          fields: workflow,job,commit,repo,author,took,ref
+#          author_name: Kuma
+#        env:
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#        if: always()
