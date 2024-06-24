@@ -2,9 +2,9 @@ name: Android-release CI/CD
 
 on:
   push:
-    branches: [ "feature" ]
+    branches: [ "feature","feature/**" ]
   pull_request:
-    branches: [ "feature" ]
+    branches: [ "feature","feature/**" ]
 
 jobs:
   build:
