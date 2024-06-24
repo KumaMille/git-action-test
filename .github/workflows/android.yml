@@ -37,11 +37,14 @@ jobs:
       - name: Clean Gradle
         run: ./gradlew clean
 
-      - name: Build Google Distribution release Apk
-        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
+      - name: Print SLACK_WEBHOOK_URL
+        run: echo ${{ secrets.SLACK_WEBHOOK_URL }}
 
-      - name: Build Google Sandbox release Apk
-        run: ./gradlew assembleGoogleSandboxRelease --stacktrace
+#      - name: Build Google Distribution release Apk
+#        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
+#
+#      - name: Build Google Sandbox release Apk
+#        run: ./gradlew assembleGoogleSandboxRelease --stacktrace
 
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
