@@ -40,6 +40,9 @@ jobs:
 #      - name: Build with Gradle
 #        run: ./gradlew build
 
+      - name: Test secret
+        run: echo ${{ secrets.TEST_SECRET }}
+
       - name: Get Current Date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
