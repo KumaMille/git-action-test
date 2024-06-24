@@ -38,7 +38,7 @@ jobs:
         run: ./gradlew clean
 
       - name: Print SLACK_WEBHOOK_URL
-        run: echo ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: echo ${{ secrets.SLACK_WEB_HOOK_URL_SECRET }}
 
 #      - name: Build Google Distribution release Apk
 #        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
@@ -53,5 +53,5 @@ jobs:
           fields: workflow,job,commit,repo,author,took,ref
           author_name: Kuma
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEB_HOOK_URL_SECRET }}
         if: always()
