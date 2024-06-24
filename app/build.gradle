@@ -23,12 +23,71 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "store", "sandbox"
+
+    productFlavors {
+//        def signingDistribution = signingConfigs.distribution
+
+        google {
+            dimension "store"
+            manifestPlaceholders = [
+                    appName: "밀리의서재",
+                    channel: "google"
+            ]
+        }
+
+        onestore {
+            dimension "store"
+            manifestPlaceholders = [
+                    appName: "밀리의서재",
+                    channel: "samsung"
+            ]
+        }
+
+        samsung {
+            dimension "store"
+            applicationIdSuffix ".samsung"
+            manifestPlaceholders = [
+                    appName: "밀리의서재 for samsung",
+                    channel: "samsung"
+            ]
+        }
+
+        sandbox {
+            dimension "sandbox"
+            manifestPlaceholders = [
+                    appSuffix: "(sandbox)"
+            ]
+//            signingConfig signingDistribution
+
+        }
+
+        qa {
+            dimension "sandbox"
+            manifestPlaceholders = [
+                    appSuffix: "(QA)"
+            ]
+//            signingConfig signingDistribution
+
+        }
+
+        distribution {
+            dimension "sandbox"
+            manifestPlaceholders = [
+                    appSuffix: ""
+            ]
+//            signingConfig signingDistribution
+
+        }
+    }
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 }
 
