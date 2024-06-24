@@ -3,7 +3,16 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
 }
 
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+def keystoreProperties = new Properties()
+
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+
 android {
+
     namespace 'com.example.git_action_test'
     compileSdk 34
 
@@ -18,16 +27,37 @@ android {
     }
 
     buildTypes {
+        debug {
+            minifyEnabled false
+            splits.abi.enable false
+            splits.density.enable false
+            aaptOptions.cruncherEnabled false
+            ext.alwaysUpdateBuildId = false
+            debuggable true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+        }
+
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    signingConfigs {
+        distribution {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(rootProject.file(keystoreProperties['storeFile']))
+            storePassword keystoreProperties['storePassword']
         }
     }
 
     flavorDimensions "store", "sandbox"
 
     productFlavors {
-//        def signingDistribution = signingConfigs.distribution
+        def signingDistribution = signingConfigs.distribution
 
         google {
             dimension "store"
@@ -59,7 +89,7 @@ android {
             manifestPlaceholders = [
                     appSuffix: "(sandbox)"
             ]
-//            signingConfig signingDistribution
+            signingConfig signingDistribution
 
         }
 
@@ -68,7 +98,7 @@ android {
             manifestPlaceholders = [
                     appSuffix: "(QA)"
             ]
-//            signingConfig signingDistribution
+            signingConfig signingDistribution
 
         }
 
@@ -77,7 +107,7 @@ android {
             manifestPlaceholders = [
                     appSuffix: ""
             ]
-//            signingConfig signingDistribution
+            signingConfig signingDistribution
 
         }
     }
