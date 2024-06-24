@@ -40,11 +40,11 @@ jobs:
       - name: Print SLACK_WEBHOOK_URL
         run: echo ${{ secrets.SLACK_WEB_HOOK_URL_SECRET }}
 
-#      - name: Build Google Distribution release Apk
-#        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
-#
-#      - name: Build Google Sandbox release Apk
-#        run: ./gradlew assembleGoogleSandboxRelease --stacktrace
+      - name: Build Google Distribution release Apk
+        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
+
+      - name: Build Google Sandbox release Apk
+        run: ./gradlew assembleGoogleSandboxRelease --stacktrace
 
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
