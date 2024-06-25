@@ -66,12 +66,12 @@ jobs:
                {
                  "color": "${{ job.status == 'success' && '#36a64f' || '#FF0000' }}",
                  "title": "GitAction 알림",
-                {
+                 "fields": [
+                  {
                      "title": "Branch",
                      "value": "*${{ github.ref }}*",
                      "short": false
-                   }
-                 "fields": [
+                   },
                    {
                      "title": "Event Name",
                      "value": "_${{github.event_name}}_",
