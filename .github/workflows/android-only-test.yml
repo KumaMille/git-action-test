@@ -6,7 +6,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -53,6 +52,10 @@ jobs:
       - name: Build Google Sandbox Release Apk
         run: ./gradlew assembleGoogleSandboxRelease --stacktrace
 
+  upload:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -93,6 +96,10 @@ jobs:
           echo "Total duration: $total_duration_formatted"
           echo "total_duration_formatted=$total_duration_formatted" >> $GITHUB_ENV
 
+  send-slack-msg:
+    needs: [build, upload]
+    runs-on: ubuntu-latest
+    steps:
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
         env:
