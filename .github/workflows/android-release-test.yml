@@ -36,8 +36,9 @@ jobs:
 
 #      - name: Clean Gradle
 #        run: ./gradlew clean
-      - name: Build Gradle
-        run: ./gradlew build
+
+#      - name: Build Gradle
+#        run: ./gradlew build
 
 #      - name: Build Google Distribution Release Apk
 #        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
@@ -60,7 +61,7 @@ jobs:
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
         with:
-          status: ${{ job.status }}
+          status: custom
           custom_payload: |
             {
               "attachments": [
