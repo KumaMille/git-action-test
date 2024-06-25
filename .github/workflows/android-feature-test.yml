@@ -82,10 +82,15 @@ jobs:
                  "title": "GitAction 알림",
                  "fields": [
                   {
-                     "title": "repo",
-                     "value": "<https://github.com/${{ github.repository }}|${{ github.repository }}>",
-                     "short": true
-                   },
+                  "title": "Repo",
+                  "value": "<https://github.com/${{ github.repository }}>",
+                  "short": true
+                  },
+                {
+                  "title": "Action URL",
+                  "value": "<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}>",
+                  "short": true
+                  },
                   {
                      "title": "빌드 시간",
                     "value": "${{ env.total_duration }} seconds",
