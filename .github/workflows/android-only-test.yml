@@ -12,24 +12,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build and Test
-        run: |
-          echo "Running build..."
-          sleep 30  # Simulating a build process
-
       - name: Record start time
         id: start_time
         run: echo "start_time=$(date +%s)" >> $GITHUB_ENV
 
+      - name: Build and Test
+        run: |
+             echo "Running build..."
+             sleep 30  # Simulating a build process
+
       - name: Calculate total duration
         id: total_duration
         run: |
-            total_duration=$(( ${{ env.workflow_end_time }} - ${{ env.workflow_start_time }} ))
+            total_duration=$(( $workflow_end_time - $workflow_start_time ))
             echo "Total duration: $total_duration seconds"
             echo "total_duration=$total_duration" >> $GITHUB_ENV
       
-      
-
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -74,15 +72,6 @@ jobs:
 #      - name: Build OneStore Sandbox Release Apk
 #        run: ./gradlew assembleOnestoreSandboxRelease --stacktrace
 
-      - name: Calculate elapsed time
-        if: steps.check_commit.outputs.run_build == 'true'
-        id: calculate_time
-        run: |
-          START_TIME=${{ env.START_TIME }}
-          END_TIME=${{ env.END_TIME }}
-          ELAPSED_TIME=$((END_TIME - START_TIME))
-          echo "Elapsed time: $ELAPSED_TIME seconds"
-          echo "::set-output name=elapsed_time::$ELAPSED_TIME"
 
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
