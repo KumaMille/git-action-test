@@ -52,22 +52,44 @@ jobs:
       - name: Build Google Sandbox Release Apk
         run: ./gradlew assembleGoogleSandboxRelease --stacktrace
 
-      - name: Find APK file
-        id: find_apk
+
+      - name: Build Google Distribution Release Apk
+        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
+
+      - name: Build Google Sandbox Release Apk
+        run: ./gradlew assembleGoogleSandboxRelease --stacktrace
+
+      - name: Find Google Distribution Release APK
+        id: find_distribution_apk
         run: |
-          APK_FILE=$(find app/build/outputs/apk/ -name "app-*-release.apk" | head -n 1)
-          if [ -z "$APK_FILE" ]; then
-            echo "No APK file found"
+          DISTRIBUTION_APK=$(find app/build/outputs/apk/ -name "app-google-distribution-release.apk" | head -n 1)
+          if [ -z "$DISTRIBUTION_APK" ]; then
+            echo "No Google Distribution Release APK file found"
             exit 1
           fi
-          echo "APK_FILE=$APK_FILE" >> $GITHUB_ENV
+          echo "DISTRIBUTION_APK=$DISTRIBUTION_APK" >> $GITHUB_ENV
 
-      - name: Upload Artifact
+      - name: Find Google Sandbox Release APK
+        id: find_sandbox_apk
+        run: |
+          SANDBOX_APK=$(find app/build/outputs/apk/ -name "app-google-sandbox-release.apk" | head -n 1)
+          if [ -z "$SANDBOX_APK" ]; then
+            echo "No Google Sandbox Release APK file found"
+            exit 1
+          fi
+          echo "SANDBOX_APK=$SANDBOX_APK" >> $GITHUB_ENV
+
+      - name: Upload Google Distribution Release APK
         uses: actions/upload-artifact@v4
         with:
-          name: Upload Google Sandbox Release Apk
-          path: ${{ env.APK_FILE }}
-          if-no-files-found: warn
+          name: Google Distribution Release Apk
+          path: ${{ env.DISTRIBUTION_APK }}
+
+      - name: Upload Google Sandbox Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Google Sandbox Release Apk
+          path: ${{ env.SANDBOX_APK }}
 
       #      - name: Build Samsung Distribution Release Apk
       #        run: ./gradlew assembleSamsungDistributionRelease --stacktrace
