@@ -43,8 +43,8 @@ jobs:
       #      - name: Clean Gradle
       #        run: ./gradlew clean
 
-      - name: Build Gradle
-        run: ./gradlew build
+  #      - name: Build Gradle
+  #        run: ./gradlew build
 
       #      - name: Build Google Distribution Release Apk
       #        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
@@ -52,18 +52,14 @@ jobs:
       - name: Build Google Sandbox Release Apk
         run: ./gradlew assembleGoogleSandboxRelease --stacktrace
 
-  upload:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Upload Google Sandbox Release Apk
-          path: |
-              app/build/outputs/apk/**/**/app-*-release.apk
-              if-no-files-found: warn
-      #
+            name: Upload Google Sandbox Release Apk
+            path: |
+                app/build/outputs/apk/**/**/app-*-release.apk
+                if-no-files-found: warn
+
       #      - name: Build Samsung Distribution Release Apk
       #        run: ./gradlew assembleSamsungDistributionRelease --stacktrace
       #
@@ -96,10 +92,6 @@ jobs:
           echo "Total duration: $total_duration_formatted"
           echo "total_duration_formatted=$total_duration_formatted" >> $GITHUB_ENV
 
-  send-slack-msg:
-    needs: [build, upload]
-    runs-on: ubuntu-latest
-    steps:
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
         env:
