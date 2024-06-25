@@ -93,7 +93,7 @@ jobs:
                  "fields": [
                   {
                      "title": "repo",
-                     "value": "<https://github.com/${{ github.workflow }}/${{ github.action }}/${{ github.job }}|${{ github.workflow }}>",
+                     "value": "<https://github.com/${{ github.repository }}|${{ github.repository }}>",
                      "short": true
                    },
                   {
