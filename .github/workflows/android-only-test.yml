@@ -72,18 +72,18 @@ jobs:
       - name: Calculate Total Duration
         id: total_duration
         run: |
-            workflow_start_time=${{ env.workflow_start_time }}
-            workflow_end_time=${{ env.workflow_end_time }}
-            total_duration=$((workflow_end_time - workflow_start_time))
-            if [ $total_duration -lt 60 ]; then
-              total_duration_formatted="${total_duration}초"
-            else
-              total_minutes=$((total_duration / 60))
-              total_seconds=$((total_duration % 60))
-              total_duration_formatted="${total_minutes}분 ${total_seconds}초"
-            fi
-            echo "Total duration: $total_duration_formatted"
-            echo "total_duration_formatted=$total_duration_formatted" >> $GITHUB_ENV
+          workflow_start_time=${{ env.workflow_start_time }}
+          workflow_end_time=${{ env.workflow_end_time }}
+          total_duration=$((workflow_end_time - workflow_start_time))
+          if [ $total_duration -lt 60 ]; then
+            total_duration_formatted="${total_duration}초"
+          else
+            total_minutes=$((total_duration / 60))
+            total_seconds=$((total_duration % 60))
+            total_duration_formatted="${total_minutes}분 ${total_seconds}초"
+          fi
+          echo "Total duration: $total_duration_formatted"
+          echo "total_duration_formatted=$total_duration_formatted" >> $GITHUB_ENV
 
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
@@ -148,4 +148,3 @@ jobs:
              ]
             }
         if: always()
-
