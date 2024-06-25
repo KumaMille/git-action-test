@@ -43,8 +43,8 @@ jobs:
       #      - name: Clean Gradle
       #        run: ./gradlew clean
 
-      #      - name: Build Gradle
-      #        run: ./gradlew build
+#      - name: Build Gradle
+#        run: ./gradlew build
 
       #      - name: Build Google Distribution Release Apk
       #        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
@@ -61,7 +61,7 @@ jobs:
         with:
           name: Upload Google Sandbox Release Apk
           path: |
-              app/build/outputs/**/**/app-*-release.apk
+              app/build/outputs/apk/**/**/app-*-release.apk
               if-no-files-found: warn
       #
       #      - name: Build Samsung Distribution Release Apk
