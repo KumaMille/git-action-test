@@ -95,12 +95,12 @@ jobs:
                  "fields": [
                   {
                   "title": "Repo",
-                  "value": "<${{env.REPOSITORY_URL}}>",
+                  "value": "<$REPOSITORY_URL>",
                   "short": true
                   },
                 {
                   "title": "Action URL",
-                  "value": "<${{evn.ACTION_URL|env.REPOSITORY_URL}}>",
+                  "value": "<$ACTION_URL| $REPOSITORY_URL>",
                   "short": true
                   },
                   {
