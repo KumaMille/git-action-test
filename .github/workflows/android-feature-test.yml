@@ -64,9 +64,16 @@ jobs:
         run: |
           workflow_start_time=${{ env.workflow_start_time }}
           workflow_end_time=${{ env.workflow_end_time }}
-          total_duration=$(( workflow_end_time - workflow_start_time ))
-          echo "Total duration: $total_duration seconds"
-          echo "total_duration=$total_duration" >> $GITHUB_ENV
+          total_duration=$((workflow_end_time - workflow_start_time))
+          if [ $total_duration -lt 60 ]; then
+            total_duration_formatted="${total_duration}초"
+          else
+            total_minutes=$((total_duration / 60))
+            total_seconds=$((total_duration % 60))
+            total_duration_formatted="${total_minutes}분 ${total_seconds}초"
+          fi
+          echo "Total duration: $total_duration_formatted"
+          echo "total_duration_formatted=$total_duration_formatted" >> $GITHUB_ENV
 
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
@@ -81,21 +88,21 @@ jobs:
                  "color": "${{ job.status == 'success' && '#36a64f' || '#FF0000' }}",
                  "title": "GitAction 알림",
                  "fields": [
+                {
+                  "title": "WorkFlows",
+                  "value": "*${{ github.workflow }}*",
+                  "short": true
+                  },
                   {
                   "title": "Repo",
                   "value": "<https://github.com/${{ github.repository }}>",
-                  "short": true
-                  },
-                {
-                  "title": "Action URL",
-                  "value": "<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}>",
-                  "short": true
+                  "short": false
                   },
                   {
-                     "title": "빌드 시간",
-                    "value": "${{ env.total_duration }} seconds",
-                     "short": true
-                   },
+                  "title": "Action URL",
+                  "value": "<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}>",
+                  "short": false
+                  },
                   {
                      "title": "Commit",
                      "value": "<https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>",
@@ -117,6 +124,11 @@ jobs:
                      "short": true
                    },
                   {
+                     "title": "빌드 시간",
+                    "value": "${{ env.total_duration_formatted }}",
+                     "short": true
+                   },
+                  {
                      "title": "Commit Message",
                      "value": "*${{github.event.head_commit.message}}*",
                      "short": false
@@ -126,4 +138,3 @@ jobs:
              ]
             }
         if: always()
-
