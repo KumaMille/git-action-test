@@ -46,9 +46,9 @@ jobs:
   #      - name: Build Gradle
   #        run: ./gradlew build
 
-      #      - name: Build Google Distribution Release Apk
-      #        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
-      #
+      - name: Build Google Distribution Release Apk
+        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
+
       - name: Build Google Sandbox Release Apk
         run: ./gradlew assembleGoogleSandboxRelease --stacktrace
 
