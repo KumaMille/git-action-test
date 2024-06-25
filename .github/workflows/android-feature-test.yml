@@ -78,7 +78,7 @@ jobs:
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEB_HOOK_URL_SECRET }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_DEPLOY_WEB_HOOK_URL }}
         with:
           status: custom
           custom_payload: |
