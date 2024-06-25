@@ -1,4 +1,4 @@
-name: Android Release CI/CD
+name: Android Feature CI/CD
 
 on:
   push:
