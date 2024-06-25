@@ -68,6 +68,15 @@ jobs:
       - name: Build OneStore Sandbox Release Apk
         run: ./gradlew assembleOnestoreSandboxRelease --stacktrace
 
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Upload Google Sandbox Release Apk
+          path: |
+            app/build/outputs/**/app-*-release.*
+            app/build/outputs/apk/googleSandbox/app-*-release.*.apk
+            if-no-files-found: warn
+
       - name: Record End time
         id: end_time
         run: echo "workflow_end_time=$(date +%s)" >> $GITHUB_ENV
