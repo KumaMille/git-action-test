@@ -82,7 +82,6 @@ jobs:
         uses: 8398a7/action-slack@v3
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEB_HOOK_URL_SECRET }}
-          TOTAL_DURATION: ${{ env.total_duration }}
         with:
           status: custom
           custom_payload: |
@@ -131,6 +130,5 @@ jobs:
                }
              ]
             }
-
         if: always()
 
