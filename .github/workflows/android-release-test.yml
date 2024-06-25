@@ -53,27 +53,27 @@ jobs:
       - name: Build Google Distribution Release Apk
         run: ./gradlew assembleGoogleDistributionRelease --stacktrace
 
-#      - name: Build Google Sandbox Release Apk
-#        run: ./gradlew assembleGoogleSandboxRelease --stacktrace
-#
-#      - name: Build Samsung Distribution Release Apk
-#        run: ./gradlew assembleSamsungDistributionRelease --stacktrace
-#
-#      - name: Build Samsung Sandbox Release Apk
-#        run: ./gradlew assembleSamsungSandboxRelease --stacktrace
-#
-#      - name: Build OneStore Distribution Release Apk
-#        run: ./gradlew assembleOnestoreDistributionRelease --stacktrace
-#
-#      - name: Build OneStore Sandbox Release Apk
-#        run: ./gradlew assembleOnestoreSandboxRelease --stacktrace
+      - name: Build Google Sandbox Release Apk
+        run: ./gradlew assembleGoogleSandboxRelease --stacktrace
+
+      - name: Build Samsung Distribution Release Apk
+        run: ./gradlew assembleSamsungDistributionRelease --stacktrace
+
+      - name: Build Samsung Sandbox Release Apk
+        run: ./gradlew assembleSamsungSandboxRelease --stacktrace
+
+      - name: Build OneStore Distribution Release Apk
+        run: ./gradlew assembleOnestoreDistributionRelease --stacktrace
+
+      - name: Build OneStore Sandbox Release Apk
+        run: ./gradlew assembleOnestoreSandboxRelease --stacktrace
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: Upload Google Sandbox Release Apk
           path: |
-            app/build/outputs/apk/googleSandbox/**/app-*-release.apk
+            app/build/outputs/apk/**/**/app-*-release.apk
             if-no-files-found: warn
 
       - name: Record End time
