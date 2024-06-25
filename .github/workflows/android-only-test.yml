@@ -83,7 +83,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEB_HOOK_URL_SECRET }}
           ACTION_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${{ github.job }}
-          REPOSITORY_NAME: ${{ github.repository }}
+          REPOSITORY_URL: ${{ github.repository }}
         with:
           status: custom
           custom_payload: |
@@ -95,12 +95,12 @@ jobs:
                  "fields": [
                   {
                   "title": "Repo",
-                  "value": "<$REPOSITORY_NAME>",
+                  "value": "<${{env.REPOSITORY_URL}}>",
                   "short": true
                   },
                 {
                   "title": "Action URL",
-                  "value": "<$REPOSITORY_URL|$REPOSITORY_NAME>",
+                  "value": "<${{evn.ACTION_URL|env.REPOSITORY_URL}}>",
                   "short": true
                   },
                   {
