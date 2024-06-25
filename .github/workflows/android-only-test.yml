@@ -50,8 +50,14 @@ jobs:
       #      - name: Build Google Distribution Release Apk
       #        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
       #
-      #      - name: Build Google Sandbox Release Apk
-      #        run: ./gradlew assembleGoogleSandboxRelease --stacktrace
+      - name: Build Google Sandbox Release Apk
+        run: ./gradlew assembleGoogleSandboxRelease --stacktrace
+
+      - name: Upload Apk
+        uses: actions/upload-artifact@v3
+        with:
+          name: google-sandbox-release # Artifact 이름
+          path: app/build/outputs/apk/release # 폴더 지정 : 이 폴더 아래의 모든 파일들이 하나의 artifact로 저장된다.
       #
       #      - name: Build Samsung Distribution Release Apk
       #        run: ./gradlew assembleSamsungDistributionRelease --stacktrace
