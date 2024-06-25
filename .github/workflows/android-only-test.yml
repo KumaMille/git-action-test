@@ -91,6 +91,11 @@ jobs:
                  "color": "${{ job.status == 'success' && '#36a64f' || '#FF0000' }}",
                  "title": "GitAction 알림",
                  "fields": [
+                {
+                  "title": "WorkFlows",
+                  "value": "*${{ github.workflow }}*",
+                  "short": true
+                  },
                   {
                   "title": "Repo",
                   "value": "<https://github.com/${{ github.repository }}>",
