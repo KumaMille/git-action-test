@@ -76,11 +76,11 @@ jobs:
             workflow_end_time=${{ env.workflow_end_time }}
             total_duration=$((workflow_end_time - workflow_start_time))
             if [ $total_duration -lt 60 ]; then
-            total_duration_formatted="${total_duration}초"
+              total_duration_formatted="${total_duration}초"
             else
-            total_minutes=$((total_duration / 60))
-            total_seconds=$((total_duration % 60))
-            total_duration_formatted="${total_minutes}분 ${total_seconds}초"
+              total_minutes=$((total_duration / 60))
+              total_seconds=$((total_duration % 60))
+              total_duration_formatted="${total_minutes}분 ${total_seconds}초"
             fi
             echo "Total duration: $total_duration_formatted"
             echo "total_duration_formatted=$total_duration_formatted" >> $GITHUB_ENV
@@ -106,18 +106,13 @@ jobs:
                   {
                   "title": "Repo",
                   "value": "<https://github.com/${{ github.repository }}>",
-                  "short": true
+                  "short": false
                   },
                   {
                   "title": "Action URL",
                   "value": "<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}>",
-                  "short": true
+                  "short": false
                   },
-                  {
-                     "title": "빌드 시간",
-                    "value": "${{ env.total_duration_formatted }}",
-                     "short": true
-                   },
                   {
                      "title": "Commit",
                      "value": "<https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>",
@@ -136,6 +131,11 @@ jobs:
                    {
                      "title": "작성자",
                      "value": "*${{ github.event.head_commit.author.name }}*",
+                     "short": true
+                   },
+                  {
+                     "title": "빌드 시간",
+                    "value": "${{ env.total_duration_formatted }}",
                      "short": true
                    },
                   {
