@@ -19,7 +19,6 @@ jobs:
       - name: Build and Test
         run: |
           echo "Running build..."
-          sleep 30  # Simulating a build process
 
       - name: Calculate build duration
         id: build_duration
