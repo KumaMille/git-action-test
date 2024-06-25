@@ -12,11 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Record start time
+      - name: Record Start Time
         id: start_time
         run: echo "workflow_start_time=$(date +%s)" >> $GITHUB_ENV
 
-      - name: Build and Test
+      - name: Build And Test
         run: |
           echo "Running build..."
           sleep 30  # Simulating a build process
@@ -65,11 +65,11 @@ jobs:
 #      - name: Build OneStore Sandbox Release Apk
 #        run: ./gradlew assembleOnestoreSandboxRelease --stacktrace
 
-      - name: Record end time
+      - name: Record End time
         id: end_time
         run: echo "workflow_end_time=$(date +%s)" >> $GITHUB_ENV
 
-      - name: Calculate total duration
+      - name: Calculate Total Duration
         id: total_duration
         run: |
           workflow_start_time=${{ env.workflow_start_time }}
