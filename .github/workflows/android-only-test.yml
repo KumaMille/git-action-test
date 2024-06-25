@@ -64,7 +64,7 @@ jobs:
             {
              "attachments": [
                {
-                 "color": "${{ job.status == 'success' && 'good' || 'danger' }}",
+                 "color": "${{ job.status == 'success' ? 'good' : 'danger' }}",
                  "title": "GitAction 알림",
                  "fields": [
                    {
