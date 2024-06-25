@@ -64,28 +64,28 @@ jobs:
             {
              "attachments": [
                {
-                 "color": "${{ job.status == 'success' && '#FF0000' || '#36a64f' }}",
+                 "color": "${{ job.status == 'success' && '#36a64f' || '#FF0000' }}",
                  "title": "GitAction 알림",
+                {
+                     "title": "Branch",
+                     "value": "${{ github.ref }}",
+                     "short": false
+                   }
                  "fields": [
                    {
                      "title": "Event Name",
                      "value": "${{github.event_name}}",
-                     "short": false
+                     "short": true
                    },
                    {
                      "title": "Commit Message",
                      "value": "${{github.event.head_commit.message}}",
-                     "short": false
+                     "short": true
                    },
                    {
                      "title": "Author",
                      "value": "${{ github.event.head_commit.author.name }}",
-                     "short": false
-                   },
-               {
-                     "title": "Title Link",
-                     "value": "${{ github.title_link }}",
-                     "short": false
+                     "short": true
                    }
                  ]
                }
