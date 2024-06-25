@@ -43,8 +43,8 @@ jobs:
       #      - name: Clean Gradle
       #        run: ./gradlew clean
 
-#      - name: Build Gradle
-#        run: ./gradlew build
+      - name: Build Gradle
+        run: ./gradlew build
 
       #      - name: Build Google Distribution Release Apk
       #        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
