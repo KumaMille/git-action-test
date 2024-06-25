@@ -56,9 +56,9 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: build-artifacts
+          name: Upload Google Sandbox Release Apk
           path: |
-              app/build/outputs/**/app-*-release.*
+              app/build/outputs/**/app-*-release.*.apk
               if-no-files-found: warn
       #
       #      - name: Build Samsung Distribution Release Apk
