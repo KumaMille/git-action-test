@@ -57,7 +57,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: google-sandbox-release # Artifact 이름
-          path: app/build/outputs/apk/release # 폴더 지정 : 이 폴더 아래의 모든 파일들이 하나의 artifact로 저장된다.
+          path: app/build/outputs/apk/googleSandboxRelease/*.apk # 폴더 지정 : 이 폴더 아래의 모든 파일들이 하나의 artifact로 저장된다.
+          if-no-files-found: warn
       #
       #      - name: Build Samsung Distribution Release Apk
       #        run: ./gradlew assembleSamsungDistributionRelease --stacktrace
