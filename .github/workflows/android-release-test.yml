@@ -2,9 +2,9 @@ name: Android-release CI/CD
 
 on:
   push:
-    branches: [ "master", "feature/**" ]
+    branches: [ "master","release/*", "develop", "hotfix/*" ]
   pull_request:
-    branches: [ "master", "feature/**" ]
+    branches: [ "master","release/*", "develop", "hotfix/*" ]
 
 jobs:
   build:
@@ -31,26 +31,35 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Grant execute permission for gradlew
+      - name: Grant Execute Permission For Gradlew
         run: chmod +x gradlew
 
       - name: Clean Gradle
         run: ./gradlew clean
 
-      - name: Print SLACK_WEBHOOK_URL
-        run: echo ${{ secrets.SLACK_WEB_HOOK_URL_SECRET }}
-
-      - name: Build Google Distribution release Apk
+      - name: Build Google Distribution Release Apk
         run: ./gradlew assembleGoogleDistributionRelease --stacktrace
 
-      - name: Build Google Sandbox release Apk
+      - name: Build Google Sandbox Release Apk
         run: ./gradlew assembleGoogleSandboxRelease --stacktrace
+
+      - name: Build Samsung Distribution Release Apk
+        run: ./gradlew assembleSamsungDistributionRelease --stacktrace
+
+      - name: Build Samsung Sandbox Release Apk
+        run: ./gradlew assembleSamsungSandboxRelease --stacktrace
+
+      - name: Build OneStore Distribution Release Apk
+        run: ./gradlew assembleOnestoreDistributionRelease --stacktrace
+
+      - name: Build OneStore Sandbox Release Apk
+        run: ./gradlew assembleOnestoreSandboxRelease --stacktrace
 
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
-          fields: workflow,job,commit,repo,author,took,ref
+          fields: workflow,job,commit,repo,author,took,ref,head_commit.message,event_name
           author_name: Kuma
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEB_HOOK_URL_SECRET }}
