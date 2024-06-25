@@ -73,7 +73,7 @@ jobs:
         with:
           name: Upload Google Sandbox Release Apk
           path: |
-            app/build/outputs/apk/googleSandbox/**/app-*-release.*.apk
+            app/build/outputs/apk/googleSandbox/**/app-*-release.apk
             if-no-files-found: warn
 
       - name: Record End time
