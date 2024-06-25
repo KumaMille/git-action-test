@@ -32,6 +32,16 @@ jobs:
       - name: Grant Execute Permission For Gradlew
         run: chmod +x gradlew
 
+      - name: Calculate elapsed time
+        if: steps.check_commit.outputs.run_build == 'true'
+        id: calculate_time
+        run: |
+                START_TIME=${{ env.START_TIME }}
+                END_TIME=${{ env.END_TIME }}
+                ELAPSED_TIME=$((END_TIME - START_TIME))
+                echo "Elapsed time: $ELAPSED_TIME seconds"
+                echo "::set-output name=elapsed_time::$ELAPSED_TIME"
+
 #      - name: Clean Gradle
 #        run: ./gradlew clean
 
