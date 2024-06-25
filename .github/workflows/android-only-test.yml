@@ -95,12 +95,12 @@ jobs:
                  "fields": [
                   {
                   "title": "Repo",
-                  "value": "<$REPOSITORY_URL>",
+                  "value": "<${{ github.repository }}>",
                   "short": true
                   },
                 {
                   "title": "Action URL",
-                  "value": "<$ACTION_URL| $REPOSITORY_URL>",
+                  "value": "<$https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${{ github.job }}| ${{ github.repository }}>",
                   "short": true
                   },
                   {
