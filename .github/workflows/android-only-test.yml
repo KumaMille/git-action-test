@@ -82,6 +82,8 @@ jobs:
         uses: 8398a7/action-slack@v3
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEB_HOOK_URL_SECRET }}
+          ACTION_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${{ github.job }}
+          REPOSITORY_NAME: ${{ github.repository }}
         with:
           status: custom
           custom_payload: |
@@ -92,10 +94,15 @@ jobs:
                  "title": "GitAction 알림",
                  "fields": [
                   {
-                     "title": "repo",
-                     "value": "<https://github.com/${{ github.workflow }}/${{ github.action }}/${{ github.sha }}/${{ github.event_name }}|${{ github.workflow }}/${{ github.sha }}/${{ github.event_name }}>",
-                     "short": true
-                   },
+                  "title": "Repo",
+                  "value": "<$REPOSITORY_NAME>",
+                  "short": true
+                  },
+                {
+                  "title": "Action URL",
+                  "value": "<$REPOSITORY_URL|$REPOSITORY_NAME>",
+                  "short": true
+                  },
                   {
                      "title": "빌드 시간",
                     "value": "${{ env.total_duration }} seconds",
