@@ -6,26 +6,35 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+
+    runs-on: self-hosted
+    strategy:
+      max-parallel: 4
+      matrix:
+        task:
+          - assembleGoogleDistributionRelease
+          - assembleGoogleSandboxRelease
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true  # Fetch submodules: recursive
+          token: ${{ secrets.GIT_PERSONAL_TOKEN }}
 
       - name: Record Start Time
         id: start_time
         run: echo "workflow_start_time=$(date +%s)" >> $GITHUB_ENV
 
-      - name: Build And Test
-        run: |
-          echo "Running build..."
-          sleep 30  # Simulating a build process
+      - name: Set Build Number
+        id: set_build_number
+        run: echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: gradle
+#      - name: Set up JDK 17
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: '17'
+#          distribution: 'temurin'
+#          cache: gradle
 
       - name: Cache Gradle
         uses: actions/cache@v3
@@ -40,57 +49,51 @@ jobs:
       - name: Grant Execute Permission For Gradlew
         run: chmod +x gradlew
 
-      #      - name: Clean Gradle
-      #        run: ./gradlew clean
+      - name: Build release Apk
+        run: ./gradlew ${{ matrix.task }} --stacktrace --daemon
 
-  #      - name: Build Gradle
-  #        run: ./gradlew build
-
-      - name: Build Google Distribution Release Apk
-        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
-
-      - name: Build Google Sandbox Release Apk
-        run: ./gradlew assembleGoogleSandboxRelease --stacktrace
-
-
-      - name: Build Google Distribution Release Apk
-        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
-
-      - name: Build Google Sandbox Release Apk
-        run: ./gradlew assembleGoogleSandboxRelease --stacktrace
-
-      - name: Find Google Distribution Release APK
-        id: find_distribution_apk
+      - name: Find APK
+        id: find_apk
         run: |
-          DISTRIBUTION_APK=$(find app/build/outputs/apk/ -name "app-google-distribution-release.apk" | head -n 1)
-          if [ -z "$DISTRIBUTION_APK" ]; then
-            echo "No Google Distribution Release APK file found"
+          BUILD_NUMBER=${{ env.BUILD_NUMBER }}
+          if [[ "${{ matrix.task }}" == "assembleGoogleDistributionRelease" ]]; then
+            APK_NAME="app-google-distribution-release-${BUILD_NUMBER}.apk"
+            APK_PATH=$(find app/build/outputs/apk/ -name "app-google-distribution-release.apk" | head -n 1)
+          elif [[ "${{ matrix.task }}" == "assembleGoogleSandboxRelease" ]]; then
+            APK_NAME="app-google-sandbox-release-${BUILD_NUMBER}.apk"
+            APK_PATH=$(find app/build/outputs/apk/ -name "app-google-sandbox-release.apk" | head -n 1)
+          fi
+          if [ -z "$APK_PATH" ]; then
+            echo "No APK file found for ${{ matrix.task }}"
             exit 1
           fi
-          echo "DISTRIBUTION_APK=$DISTRIBUTION_APK" >> $GITHUB_ENV
+          NEW_APK_PATH="${APK_PATH%/*}/$APK_NAME"
+          mv $APK_PATH $NEW_APK_PATH
+          echo "APK_PATH=$NEW_APK_PATH" >> $GITHUB_ENV
+          echo "APK_NAME=$APK_NAME" >> $GITHUB_ENV
 
-      - name: Find Google Sandbox Release APK
-        id: find_sandbox_apk
-        run: |
-          SANDBOX_APK=$(find app/build/outputs/apk/ -name "app-google-sandbox-release.apk" | head -n 1)
-          if [ -z "$SANDBOX_APK" ]; then
-            echo "No Google Sandbox Release APK file found"
-            exit 1
-          fi
-          echo "SANDBOX_APK=$SANDBOX_APK" >> $GITHUB_ENV
 
-      - name: Upload Google Distribution Release APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Google Distribution Release Apk
-          path: ${{ env.DISTRIBUTION_APK }}
+          name: ${{ env.APK_NAME }}
+          path: ${{ env.APK_PATH }}
 
-      - name: Upload Google Sandbox Release APK
-        uses: actions/upload-artifact@v4
+      - name: Upload to Firebase App Distribution
+        uses: emertozd/Firebase-Distribution-Github-Action@v2
         with:
-          name: Google Sandbox Release Apk
-          path: ${{ env.SANDBOX_APK }}
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+          groups: millie-tester  # Firebase 콘솔에서 생성한 그룹 이름
+          file: ${{ env.APK_PATH }}
 
+
+      #      - name: Build Google Distribution Release Apk
+      #        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
+      #      #
+      #      - name: Build Google Sandbox Release Apk
+      #        run: ./gradlew assembleGoogleSandboxRelease --stacktrace
+      #
       #      - name: Build Samsung Distribution Release Apk
       #        run: ./gradlew assembleSamsungDistributionRelease --stacktrace
       #
@@ -126,7 +129,7 @@ jobs:
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_TEST_WEB_HOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_PERSONAL_WEB_HOOK_URL }}
         with:
           status: custom
           custom_payload: |
@@ -186,3 +189,12 @@ jobs:
              ]
             }
         if: always()
+
+  cleanup:
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - name: Cleanup Artifacts
+        run: |
+          echo "Cleaning up old artifacts..."
+          gh api repos/:owner/:repo/actions/artifacts | jq '.artifacts | sort_by(.created_at) | .[0:-50] | .[] | .id' | xargs -I {} gh api repos/:owner/:repo/actions/artifacts/{} -X DELETE        
