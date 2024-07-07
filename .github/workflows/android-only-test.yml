@@ -17,9 +17,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: true  # Fetch submodules: recursive
-          token: ${{ secrets.GIT_PERSONAL_TOKEN }}
 
       - name: Record Start Time
         id: start_time
