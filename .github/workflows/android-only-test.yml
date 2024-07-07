@@ -35,8 +35,10 @@ jobs:
 
       - name: Set up Android SDK
         run: |
-          echo "ANDROID_HOME=${{ runner.temp }}/android-sdk" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=${{ runner.temp }}/android-sdk" >> $GITHUB_ENV
+          ANDROID_HOME="${{ runner.temp }}/android-sdk"
+          ANDROID_SDK_ROOT="${{ runner.temp }}/android-sdk"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
           mkdir -p $ANDROID_HOME/cmdline-tools/latest
           curl -L https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -o $ANDROID_HOME/cmdline-tools/latest/cmdline-tools.zip
           unzip $ANDROID_HOME/cmdline-tools/latest/cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools/latest
@@ -46,8 +48,8 @@ jobs:
 
       - name: Install Android SDK
         run: |
-          yes | sdkmanager --licenses
-          sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3"
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3"
 
       - name: Cache Gradle
         uses: actions/cache@v3
@@ -90,33 +92,6 @@ jobs:
         with:
           name: ${{ env.APK_NAME }}
           path: ${{ env.APK_PATH }}
-
-      #      - name: Upload to Firebase App Distribution
-      #        uses: emertozd/Firebase-Distribution-Github-Action@v2
-      #        with:
-      #          appId: ${{ secrets.FIREBASE_APP_ID }}
-      #          serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
-      #          groups: millie-tester  # Firebase 콘솔에서 생성한 그룹 이름
-      #          file: ${{ env.APK_PATH }}
-
-
-      #      - name: Build Google Distribution Release Apk
-      #        run: ./gradlew assembleGoogleDistributionRelease --stacktrace
-      #      #
-      #      - name: Build Google Sandbox Release Apk
-      #        run: ./gradlew assembleGoogleSandboxRelease --stacktrace
-      #
-      #      - name: Build Samsung Distribution Release Apk
-      #        run: ./gradlew assembleSamsungDistributionRelease --stacktrace
-      #
-      #      - name: Build Samsung Sandbox Release Apk
-      #        run: ./gradlew assembleSamsungSandboxRelease --stacktrace
-      #
-      #      - name: Build OneStore Distribution Release Apk
-      #        run: ./gradlew assembleOnestoreDistributionRelease --stacktrace
-      #
-      #      - name: Build OneStore Sandbox Release Apk
-      #        run: ./gradlew assembleOnestoreSandboxRelease --stacktrace
 
       - name: Record End time
         id: end_time
@@ -209,4 +184,4 @@ jobs:
       - name: Cleanup Artifacts
         run: |
           echo "Cleaning up old artifacts..."
-          gh api repos/:owner/:repo/actions/artifacts | jq '.artifacts | sort_by(.created_at) | .[0:-50] | .[] | .id' | xargs -I {} gh api repos/:owner/:repo/actions/artifacts/{} -X DELETE        
+          gh api repos/:owner/:repo/actions/artifacts | jq '.artifacts | sort_by(.created_at) | .[0:-50] | .[] | .id' | xargs -I {} gh api repos/:owner/:repo/actions/artifacts/{} -X DELETE
