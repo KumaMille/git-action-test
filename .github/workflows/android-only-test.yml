@@ -33,6 +33,18 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Set up Android SDK
+        run: |
+          echo "ANDROID_HOME=${{ runner.temp }}/android-sdk" >> $GITHUB_ENV
+          echo "${{ runner.temp }}/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+
+      - name: Install Android SDK
+        run: |
+          mkdir -p $ANDROID_HOME/cmdline-tools/latest
+          curl -L https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -o $ANDROID_HOME/cmdline-tools/latest/cmdline-tools.zip
+          unzip $ANDROID_HOME/cmdline-tools/latest/cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools/latest
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+
       - name: Cache Gradle
         uses: actions/cache@v3
         with:
