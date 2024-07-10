@@ -73,7 +73,7 @@ jobs:
             signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE_JKS }}
             alias: ${{ secrets.ANDROID_KEY_ALIAS }}
             keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-            keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }
+            keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
       - name: Find APK
         id: find_apk
