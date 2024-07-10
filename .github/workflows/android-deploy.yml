@@ -69,11 +69,11 @@ jobs:
         id: sign
         uses: r0adkll/sign-android-release@v1
         with:
-            releaseDirectory: build/app/outputs/bundle/devRelease
-            signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE_JKS }}
-            alias: ${{ secrets.ANDROID_KEY_ALIAS }}
-            keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-            keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
+              releaseDirectory: build/app/outputs/bundle/devRelease
+              signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE_JKS }}
+              alias: ${{ secrets.ANDROID_KEY_ALIAS }}
+              keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+              keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
       - name: Find APK
         id: find_apk
