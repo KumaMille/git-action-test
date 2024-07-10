@@ -2,7 +2,7 @@ name: Android Only Test CI/CD
 
 on:
   push:
-    branches: [ "tests/*" ]
+    branches: [ "test/*" ]
 
 jobs:
   build:
@@ -12,8 +12,9 @@ jobs:
       max-parallel: 4
       matrix:
         task:
-          - assembleGoogleDistributionRelease
-          - assembleGoogleSandboxRelease
+          - bundleGoogleDistributionRelease
+#          - assembleSamsungDistributionRelease
+#          - assembleOnestoreDistributionRelease
 
     steps:
       - uses: actions/checkout@v4
@@ -64,20 +65,27 @@ jobs:
       - name: Grant Execute Permission For Gradlew
         run: chmod +x gradlew
 
-      - name: Build release Apk
-        run: ./gradlew ${{ matrix.task }} --stacktrace --daemon
+      - name: Sign AAB
+        id: sign
+        uses: r0adkll/sign-android-release@v1
+        with:
+            releaseDirectory: build/app/outputs/bundle/devRelease
+            signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE_JKS }}
+            alias: ${{ secrets.ANDROID_KEY_ALIAS }}
+            keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+            keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }
 
       - name: Find APK
         id: find_apk
         run: |
           BUILD_NUMBER=${{ env.BUILD_NUMBER }}
-          if [[ "${{ matrix.task }}" == "assembleGoogleDistributionRelease" ]]; then
-            APK_NAME="app-google-distribution-release-${BUILD_NUMBER}.apk"
-            APK_PATH=$(find app/build/outputs/apk/ -name "app-google-distribution-release.apk" | head -n 1)
-          elif [[ "${{ matrix.task }}" == "assembleGoogleSandboxRelease" ]]; then
-            APK_NAME="app-google-sandbox-release-${BUILD_NUMBER}.apk"
-            APK_PATH=$(find app/build/outputs/apk/ -name "app-google-sandbox-release.apk" | head -n 1)
-          fi
+          if [[ "${{ matrix.task }}" == "bundleGoogleDistributionRelease" ]]; then
+            APK_NAME="app-google-distribution-release-${BUILD_NUMBER}.aab"
+            APK_PATH=$(find app/build/app/outputs/bundle/ -name "app-google-distribution-release.aab" | head -n 1)
+#          elif [[ "${{ matrix.task }}" == "assembleGoogleSandboxRelease" ]]; then
+#            APK_NAME="app-google-sandbox-release-${BUILD_NUMBER}.apk"
+#            APK_PATH=$(find app/build/outputs/apk/ -name "app-google-sandbox-release.apk" | head -n 1)
+#          fi
           if [ -z "$APK_PATH" ]; then
             echo "No APK file found for ${{ matrix.task }}"
             exit 1
@@ -92,6 +100,7 @@ jobs:
         with:
           name: ${{ env.APK_NAME }}
           path: ${{ env.APK_PATH }}
+          retention-days: 3
 
       - name: Record End time
         id: end_time
