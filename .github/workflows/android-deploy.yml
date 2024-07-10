@@ -65,6 +65,9 @@ jobs:
       - name: Grant Execute Permission For Gradlew
         run: chmod +x gradlew
 
+      - name: Build release Apk
+        run: ./gradlew ${{ matrix.task }} --stacktrace --daemon
+
       - name: Sign AAB
         id: sign
         uses: r0adkll/sign-android-release@v1
