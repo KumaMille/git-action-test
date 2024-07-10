@@ -85,7 +85,7 @@ jobs:
 #          elif [[ "${{ matrix.task }}" == "assembleGoogleSandboxRelease" ]]; then
 #            APK_NAME="app-google-sandbox-release-${BUILD_NUMBER}.apk"
 #            APK_PATH=$(find app/build/outputs/apk/ -name "app-google-sandbox-release.apk" | head -n 1)
-#          fi
+          fi
           if [ -z "$APK_PATH" ]; then
             echo "No APK file found for ${{ matrix.task }}"
             exit 1
