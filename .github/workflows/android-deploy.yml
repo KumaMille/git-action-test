@@ -115,6 +115,14 @@ jobs:
           path: ${{ env.APK_PATH }}
           retention-days: 3
 
+      - name: Upload to Firebase App Distribution
+        uses: emertozd/Firebase-Distribution-Github-Action@v2
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+          groups: millie-tester  # Firebase 콘솔에서 생성한 그룹 이름
+          file: ${{ env.APK_PATH }}
+          
 #      - name: Deploy to Play Store (INTERNAL) 🚀
 #        uses: r0adkll/upload-google-play@v1
 #        with:
