@@ -14,11 +14,11 @@ if (keystorePropertiesFile.exists()) {
 
 android {
 
-    namespace 'com.example.git_action_test'
+    namespace 'kr.kuma.git_action_test'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.git_action_test"
+        applicationId "kr.kuma.git_action_test"
         minSdk 24
         targetSdk 34
         versionCode 1

@@ -1,4 +1,4 @@
-package com.example.git_action_test
+package kr.kuma.git_action_test
 
 import org.junit.Test
 
