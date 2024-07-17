@@ -128,7 +128,7 @@ jobs:
           appId: ${{ secrets.FIREBASE_APP_ID }}
           serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
           groups: millie-tester  # Firebase 콘솔에서 생성한 그룹 이름
-          file: ${{ env.APK_NAME }}
+          file: ${{ env.APK_PATH }}
 
 
 #      - name: Deploy to Play Store (INTERNAL) 🚀
