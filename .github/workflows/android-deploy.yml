@@ -124,10 +124,11 @@ jobs:
       - name: Upload to Firebase App Distribution
         uses: emertozd/Firebase-Distribution-Github-Action@v2
         with:
+          run : echo "path ${{env.APK_PATH}} name ${{env.APK_NAME}}"
           appId: ${{ secrets.FIREBASE_APP_ID }}
           serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
           groups: millie-tester  # Firebase 콘솔에서 생성한 그룹 이름
-          file: ${{ env.APK_PATH }}
+          file: ${{ env.APK_NAME }}
 
 
 #      - name: Deploy to Play Store (INTERNAL) 🚀
