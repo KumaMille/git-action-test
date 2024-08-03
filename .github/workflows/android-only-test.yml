@@ -28,9 +28,14 @@ jobs:
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_
           echo "COMMIT_DESCRIPTION=$COMMIT_DESCRIPTION" >> $GITHUB_ENV
 
+      - name: Output environment variable
+        run: echo "job1에서 설정된 값 $COMMIT_DESCRIPTION"
+
   build:
     runs-on: self-hosted
     needs: check-description
+    env:
+      COMMIT_DESCRIPTION: ${{ vars.COMMIT_DESCRIPTION }}
     if: ${{ env.COMMIT_DESCRIPTION == 'true' }} # 조건 설정
     strategy:
       max-parallel: 5
