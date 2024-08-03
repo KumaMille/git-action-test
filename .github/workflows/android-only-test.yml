@@ -15,23 +15,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check commit message for 'description'
-        id: check_commit
+      - name: Get Commit Description
+        id: get_commit_description
+        run: echo "COMMIT_DESCRIPTION=$(git log -1 --pretty=%b)" >> $GITHUB_ENV
+
+      - name: Exit if commit description is empty
         run: |
-          # Get the latest commit message
-          commit_message=$(git log -1 --pretty=%B)
-
-          # Print the commit message for debugging
-          echo "Commit message: $commit_message"
-
-          # Check if the commit message contains 'description'
-          if echo "$commit_message" | grep -iq "description"; then
-            echo "The commit contains 'description'. Proceeding with the job."
-            echo "description=true" >> $GITHUB_ENV
-          else
-            echo "The commit does not contain 'description'. Exiting."
-            echo "description=false" >> $GITHUB_ENV
+          if [ -z "${{ env.COMMIT_DESCRIPTION }}" ]; then
+            echo "Commit description is empty. Exiting..."
+            exit 1
           fi
+
   build:
     runs-on: self-hosted
     needs: check-description
