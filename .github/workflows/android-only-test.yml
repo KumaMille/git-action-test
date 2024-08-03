@@ -36,7 +36,6 @@ jobs:
     needs: check-description
     env:
       COMMIT_DESCRIPTION: ${{ vars.COMMIT_DESCRIPTION }}
-    if: ${{ env.COMMIT_DESCRIPTION == 'true' }} # 조건 설정
     strategy:
       max-parallel: 5
       matrix:
@@ -60,6 +59,8 @@ jobs:
       - name: Check commit message
         id: check_commit
         run: |
+          echo "job1에서 설정된 값 ${{env.COMMIT_DESCRIPTION}}"
+          
           if git log -1 --pretty=%B | grep -q "description"; then
             echo "description=true" >> $GITHUB_ENV
           else
