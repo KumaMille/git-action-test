@@ -2,7 +2,7 @@ name: Android Test CI/CD
 
 on:
   push:
-#    branches: [ "release/*" ,"hotfix/*"]
+    #    branches: [ "release/*" ,"hotfix/*"]
     branches: [ "test/*" ]
 #  pull_request:
 #    branches: [ "master","release/*", "develop", "hotfix/*" ]
@@ -20,28 +20,18 @@ jobs:
         run: |
           # Extract branch name without prefix
           BRANCH_NAME=$(echo "${{ github.ref_name }}" | sed 's/^[^/]*\///')
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
 
           COMMIT_MESSAGE=$(git log -1 --pretty=%s ${{ github.sha }})
           COMMIT_DESCRIPTION=$(git log -1 --pretty=%b ${{ github.sha }})
 
-          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
-          echo "COMMIT_DESCRIPTION=$COMMIT_DESCRIPTION" >> $GITHUB_OUTPUT
-
-      - name: Check if commit description is empty
-        id: check_empty_description
-        run: |
-          if [ -z "${{ env.COMMIT_DESCRIPTION }}" ]; then
-            echo "description=true" >> $GITHUB_OUTPUT
-          else
-            echo "description=false" >> $GITHUB_OUTPUT
-          fi
-
+          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_
+          echo "COMMIT_DESCRIPTION=$COMMIT_DESCRIPTION" >> $GITHUB_ENV
 
   build:
     runs-on: self-hosted
     needs: check-description
-    if: needs.check-description.output.description == 'true'
+    if: ${{ env.COMMIT_DESCRIPTION == 'true' }} # 조건 설정
     strategy:
       max-parallel: 5
       matrix:
@@ -209,8 +199,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+
 
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
@@ -227,12 +216,12 @@ jobs:
                  "fields": [
                     {
                       "title": "변경점",
-                      "value": "`${{ build.output.COMMIT_MESSAGE }}`",
+                      "value": "`${{ env.COMMIT_MESSAGE }}`",
                       "short": false
                   },
                  {
                       "title": "커밋 설명",
-                      "value": "`${{ build.output.COMMIT_DESCRIPTION }}`",
+                      "value": "`${{ env.COMMIT_DESCRIPTION }}`",
                       "short": false
                     },
                   {
@@ -242,7 +231,7 @@ jobs:
                   },
                   {
                      "title": "브랜치",
-                     "value": "`${{ build.output.BRANCH_NAME }}`",
+                     "value": "`${{ env.BRANCH_NAME }}`",
                      "short": true
                    },
                    {
@@ -257,7 +246,7 @@ jobs:
                    },
                   {
                     "title": "담당자",
-                    "value": "",
+                    "value": "abc",
                      "short": false
                    }
                  ],
@@ -268,15 +257,3 @@ jobs:
             }
         if: ${{ needs.build.result == 'success' }}
 
-
-#  슬렉 멤버 아이디 리스트
-#  kuma U03J1DUMGKX
-#  dao U06LXL8P1J4
-#  adam UJMMR68GZ
-#  aaron U01V6DZJB3Q
-#  dana U03EK6MPRC3
-#  inu U03BY632CG3
-#  morgan U065E5C6HSS
-#  fitz U06L27PAZ70
-#  bale U01849EGG01
-#  francis U07D4C299EX
