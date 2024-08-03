@@ -26,7 +26,7 @@ jobs:
 
       - name: Output environment variable
         run: |
-          echo "Job1에서 설정된 값: $COMMIT_DESCRIPTION"
+          echo "Job1에서 설정된 값: ${{env.COMMIT_DESCRIPTION}}"
 
 #  build:
 #    runs-on: self-hosted
