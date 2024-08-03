@@ -15,9 +15,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Get Commit Description
-        id: get_commit_description
-        run: echo "COMMIT_DESCRIPTION=$(git log -1 --pretty=%b)" >> $GITHUB_OUTPUT
+      - name: Fetch Branch and Commit Messages
+        id: fetch_info
+        run: |
+          # Extract branch name without prefix
+          BRANCH_NAME=$(echo "${{ github.ref_name }}" | sed 's/^[^/]*\///')
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
+          COMMIT_MESSAGE=$(git log -1 --pretty=%s ${{ github.sha }})
+          COMMIT_DESCRIPTION=$(git log -1 --pretty=%b ${{ github.sha }})
+
+          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
+          echo "COMMIT_DESCRIPTION=$COMMIT_DESCRIPTION" >> $GITHUB_OUTPUT
 
       - name: Check if commit description is empty
         id: check_empty_description
@@ -200,21 +209,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Checkout code for commit messages
+      - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Fetch Branch and Commit Messages
-        id: fetch_info
-        run: |
-          # Extract branch name without prefix
-          BRANCH_NAME=$(echo "${{ github.ref_name }}" | sed 's/^[^/]*\///')
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
-
-          COMMIT_MESSAGE=$(git log -1 --pretty=%s ${{ github.sha }})
-          COMMIT_DESCRIPTION=$(git log -1 --pretty=%b ${{ github.sha }})
-
-          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
-          echo "COMMIT_DESCRIPTION=$COMMIT_DESCRIPTION" >> $GITHUB_ENV
 
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
@@ -231,12 +227,12 @@ jobs:
                  "fields": [
                     {
                       "title": "변경점",
-                      "value": "`${{ env.COMMIT_MESSAGE }}`",
+                      "value": "`${{ build.output.COMMIT_MESSAGE }}`",
                       "short": false
                   },
                  {
                       "title": "커밋 설명",
-                      "value": "`${{ env.COMMIT_DESCRIPTION }}`",
+                      "value": "`${{ build.output.COMMIT_DESCRIPTION }}`",
                       "short": false
                     },
                   {
@@ -246,7 +242,7 @@ jobs:
                   },
                   {
                      "title": "브랜치",
-                     "value": "`${{ env.BRANCH_NAME }}`",
+                     "value": "`${{ build.output.BRANCH_NAME }}`",
                      "short": true
                    },
                    {
@@ -261,7 +257,7 @@ jobs:
                    },
                   {
                     "title": "담당자",
-                    "value": "<@U06LXL8P1J4>  <@U03J1DUMGKX>",
+                    "value": "",
                      "short": false
                    }
                  ],
