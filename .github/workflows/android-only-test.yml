@@ -31,11 +31,11 @@ jobs:
           else
             echo "The commit does not contain 'description'. Exiting."
             echo "description=false" >> $GITHUB_ENV
-            exit 1  # Exit the action if 'description' is not found
           fi
   build:
     runs-on: self-hosted
     needs: check-description
+    if: env.description == 'true'
     strategy:
       max-parallel: 5
       matrix:
