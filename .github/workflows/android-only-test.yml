@@ -21,11 +21,12 @@ jobs:
           COMMIT_MESSAGE=$(git log -1 --pretty=%s ${{ github.sha }})
           COMMIT_DESCRIPTION=$(git log -1 --pretty=%b ${{ github.sha }})
 
-          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_
+          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
           echo "COMMIT_DESCRIPTION=$COMMIT_DESCRIPTION" >> $GITHUB_ENV
 
       - name: Output environment variable
-        run: echo "job1에서 설정된 값 $COMMIT_DESCRIPTION"
+        run: |
+          echo "Job1에서 설정된 값: $COMMIT_DESCRIPTION"
 
 #  build:
 #    runs-on: self-hosted
