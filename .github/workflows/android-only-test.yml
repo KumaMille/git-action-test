@@ -1,22 +1,74 @@
-name: Android Only Test CI/CD
+name: Android Test CI/CD
 
 on:
   push:
-    branches: [ "tests/*" ]
+#    branches: [ "release/*" ,"hotfix/*"]
+    branches: [ "test/*" ]
+#  pull_request:
+#    branches: [ "master","release/*", "develop", "hotfix/*" ]
+
 
 jobs:
-  build:
-
+  check-description:
     runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check commit message for 'description'
+        id: check_commit
+        run: |
+          # Get the latest commit message
+          commit_message=$(git log -1 --pretty=%B)
+
+          # Print the commit message for debugging
+          echo "Commit message: $commit_message"
+
+          # Check if the commit message contains 'description'
+          if echo "$commit_message" | grep -iq "description"; then
+            echo "The commit contains 'description'. Proceeding with the job."
+            echo "description=true" >> $GITHUB_ENV
+          else
+            echo "The commit does not contain 'description'. Exiting."
+            echo "description=false" >> $GITHUB_ENV
+            exit 1  # Exit the action if 'description' is not found
+          fi
+  build:
+    runs-on: self-hosted
+    needs: check-description
     strategy:
-      max-parallel: 4
+      max-parallel: 5
       matrix:
         task:
           - assembleGoogleDistributionRelease
           - assembleGoogleSandboxRelease
+          - assembleGoogleQaRelease
+          - assembleSamsungDistributionRelease
+          - assembleSamsungSandboxRelease
+          - assembleSamsungQaRelease
+          - assembleOnestoreDistributionRelease
+          - assembleOnestoreSandboxRelease
+          - assembleOnestoreQaRelease
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true  # Fetch submodules: recursive
+          token: ${{ secrets.GIT_PERSONAL_TOKEN }}
+
+      - name: Check commit message
+        id: check_commit
+        run: |
+          if git log -1 --pretty=%B | grep -q "description"; then
+            echo "description=true" >> $GITHUB_ENV
+          else
+            echo "description=false" >> $GITHUB_ENV
+          fi
+
+      - name: Set output for next workflow
+        if: env.description == 'true'
+        run: |
+          echo "description=true" >> $GITHUB_ENV          
 
       - name: Record Start Time
         id: start_time
@@ -26,76 +78,110 @@ jobs:
         id: set_build_number
         run: echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
 
+
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: gradle
-
-      - name: Set up Android SDK
         run: |
-          ANDROID_HOME="${{ runner.temp }}/android-sdk"
-          ANDROID_SDK_ROOT="${{ runner.temp }}/android-sdk"
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
-          mkdir -p $ANDROID_HOME/cmdline-tools/latest
-          curl -L https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -o $ANDROID_HOME/cmdline-tools/latest/cmdline-tools.zip
-          unzip $ANDROID_HOME/cmdline-tools/latest/cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools/latest
-          mv $ANDROID_HOME/cmdline-tools/latest/cmdline-tools/* $ANDROID_HOME/cmdline-tools/latest/
-          rmdir $ANDROID_HOME/cmdline-tools/latest/cmdline-tools
-          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          export JAVA_HOME=/opt/homebrew/Cellar/openjdk@17/17.0.7/libexec/openjdk.jdk/Contents/Home
+          export PATH=$JAVA_HOME/bin:$PATH
+          echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
+          echo "$JAVA_HOME/bin" >> $GITHUB_PATH
 
-      - name: Install Android SDK
-        run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3"
-
-      - name: Cache Gradle
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+      - name: Verify Java version
+        run: java -version
 
       - name: Grant Execute Permission For Gradlew
         run: chmod +x gradlew
 
+      - name: Create local.properties
+        run: |
+          echo "sdk.dir=$HOME/AndroidSDK" > $GITHUB_WORKSPACE/local.properties
+      #
+      #      - name: Clean Gradle Cache
+      #        run: ./gradlew clean
+
+
       - name: Build release Apk
-        run: ./gradlew ${{ matrix.task }} --stacktrace --daemon
+        run: ./gradlew ${{ matrix.task }} --stacktrace
 
       - name: Find APK
         id: find_apk
         run: |
           BUILD_NUMBER=${{ env.BUILD_NUMBER }}
-          if [[ "${{ matrix.task }}" == "assembleGoogleDistributionRelease" ]]; then
-            APK_NAME="app-google-distribution-release-${BUILD_NUMBER}.apk"
-            APK_PATH=$(find app/build/outputs/apk/ -name "app-google-distribution-release.apk" | head -n 1)
-          elif [[ "${{ matrix.task }}" == "assembleGoogleSandboxRelease" ]]; then
-            APK_NAME="app-google-sandbox-release-${BUILD_NUMBER}.apk"
-            APK_PATH=$(find app/build/outputs/apk/ -name "app-google-sandbox-release.apk" | head -n 1)
-          fi
+          TASK_NAME=${{ matrix.task }}
+          APK_NAME=""
+          APK_PATH=""
+
+          # Determine APK name and path based on task
+          case $TASK_NAME in
+            assembleGoogleDistributionRelease)
+              APK_NAME="app-google-distribution-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/googleDistribution/release/ -name "*.apk" | head -n 1)
+              ;;
+            assembleGoogleSandboxRelease)
+              APK_NAME="app-google-sandbox-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/googleSandbox/release/ -name "*.apk" | head -n 1)
+              ;;
+            assembleGoogleQaRelease)
+              APK_NAME="app-google-qa-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/googleQa/release/ -name "*.apk" | head -n 1)
+              ;;
+            assembleSamsungDistributionRelease)
+              APK_NAME="app-samsung-distribution-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/samsungDistribution/release/ -name "*.apk" | head -n 1)
+              ;;
+            assembleSamsungSandboxRelease)
+              APK_NAME="app-samsung-sandbox-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/samsungSandbox/release/ -name "*.apk" | head -n 1)
+              ;;
+            assembleSamsungQaRelease)
+              APK_NAME="app-samsung-qa-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/samsungQa/release/ -name "*.apk" | head -n 1)
+              ;;
+            assembleOnestoreDistributionRelease)
+              APK_NAME="app-onestore-distribution-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/onestoreDistribution/release/ -name "*.apk" | head -n 1)
+              ;;
+            assembleOnestoreSandboxRelease)
+              APK_NAME="app-onestore-sandbox-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/onestoreSandbox/release/ -name "*.apk" | head -n 1)
+              ;;
+            assembleOnestoreQaRelease)
+              APK_NAME="app-onestore-qa-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/onestoreQa/release/ -name "*.apk" | head -n 1)
+              ;;
+            *)
+              echo "Unknown task: $TASK_NAME"
+              exit 1
+              ;;
+          esac
+
           if [ -z "$APK_PATH" ]; then
-            echo "No APK file found for ${{ matrix.task }}"
+            echo "APK not found for task: $TASK_NAME"
             exit 1
           fi
+
           NEW_APK_PATH="${APK_PATH%/*}/$APK_NAME"
+          APK_DIR=$(dirname "$APK_PATH")
           mv $APK_PATH $NEW_APK_PATH
           echo "APK_PATH=$NEW_APK_PATH" >> $GITHUB_ENV
           echo "APK_NAME=$APK_NAME" >> $GITHUB_ENV
+          echo "APK_DIR=$APK_DIR" >> $GITHUB_ENV
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.APK_NAME }}
           path: ${{ env.APK_PATH }}
+          retention-days: 3
+
+      - name: Delete APK
+        run: |
+          rm -f ${{ env.APK_PATH }}
 
       - name: Record End time
         id: end_time
         run: echo "workflow_end_time=$(date +%s)" >> $GITHUB_ENV
+
 
       - name: Calculate Total Duration
         id: total_duration
@@ -113,6 +199,26 @@ jobs:
           echo "Total duration: $total_duration_formatted"
           echo "total_duration_formatted=$total_duration_formatted" >> $GITHUB_ENV
 
+  notify:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code for commit messages
+        uses: actions/checkout@v4
+
+      - name: Fetch Branch and Commit Messages
+        id: fetch_info
+        run: |
+          # Extract branch name without prefix
+          BRANCH_NAME=$(echo "${{ github.ref_name }}" | sed 's/^[^/]*\///')
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
+          COMMIT_MESSAGE=$(git log -1 --pretty=%s ${{ github.sha }})
+          COMMIT_DESCRIPTION=$(git log -1 --pretty=%b ${{ github.sha }})
+
+          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
+          echo "COMMIT_DESCRIPTION=$COMMIT_DESCRIPTION" >> $GITHUB_ENV
+
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
         env:
@@ -121,38 +227,33 @@ jobs:
           status: custom
           custom_payload: |
             {
-             "attachments": [
-               {
-                 "color": "${{ job.status == 'success' && '#36a64f' || '#FF0000' }}",
-                 "title": "GitAction 알림",
-                 "fields": [
+              "attachments": [
                 {
-                  "title": "WorkFlows",
-                  "value": "*${{ github.workflow }}*",
-                  "short": true
+                  "color": "${{ needs.build.result == 'success' && '#36a64f' || '#FF0000' }}",
+                  "title": "AOS Release Build",
+                 "fields": [
+                    {
+                      "title": "변경점",
+                      "value": "`${{ env.COMMIT_MESSAGE }}`",
+                      "short": false
                   },
+                 {
+                      "title": "커밋 설명",
+                      "value": "`${{ env.COMMIT_DESCRIPTION }}`",
+                      "short": false
+                    },
                   {
-                  "title": "Repo",
-                  "value": "<https://github.com/${{ github.repository }}>",
-                  "short": false
-                  },
-                  {
-                  "title": "Action URL",
+                  "title": "다운로드 주소",
                   "value": "<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}>",
                   "short": false
                   },
                   {
-                     "title": "Commit",
-                     "value": "<https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>",
-                     "short": false
-                   },
-                  {
-                     "title": "Branch",
-                     "value": "*${{ github.ref }}*",
+                     "title": "브랜치",
+                     "value": "`${{ env.BRANCH_NAME }}`",
                      "short": true
                    },
                    {
-                     "title": "Event Name",
+                     "title": "이벤트 이름",
                      "value": "_${{github.event_name}}_",
                      "short": true
                    },
@@ -162,26 +263,27 @@ jobs:
                      "short": true
                    },
                   {
-                     "title": "빌드 시간",
-                    "value": "${{ env.total_duration_formatted }}",
-                     "short": true
-                   },
-                  {
-                     "title": "Commit Message",
-                     "value": "*${{github.event.head_commit.message}}*",
+                    "title": "담당자",
+                    "value": "<@U06LXL8P1J4>  <@U03J1DUMGKX>",
                      "short": false
-                   },
-                 ]
-               }
-             ]
+                   }
+                 ],
+                  "footer": "Build Notification",
+                  "footer_icon": "https://cdn-icons-png.flaticon.com/512/226/226770.png"
+                }
+              ]
             }
-        if: always()
+        if: ${{ needs.build.result == 'success' }}
 
-  cleanup:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Cleanup Artifacts
-        run: |
-          echo "Cleaning up old artifacts..."
-          gh api repos/:owner/:repo/actions/artifacts | jq '.artifacts | sort_by(.created_at) | .[0:-50] | .[] | .id' | xargs -I {} gh api repos/:owner/:repo/actions/artifacts/{} -X DELETE
+
+#  슬렉 멤버 아이디 리스트
+#  kuma U03J1DUMGKX
+#  dao U06LXL8P1J4
+#  adam UJMMR68GZ
+#  aaron U01V6DZJB3Q
+#  dana U03EK6MPRC3
+#  inu U03BY632CG3
+#  morgan U065E5C6HSS
+#  fitz U06L27PAZ70
+#  bale U01849EGG01
+#  francis U07D4C299EX
