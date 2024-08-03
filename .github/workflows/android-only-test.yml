@@ -19,12 +19,15 @@ jobs:
         id: get_commit_description
         run: echo "COMMIT_DESCRIPTION=$(git log -1 --pretty=%b)" >> $GITHUB_ENV
 
-      - name: Exit if commit description is empty
+      - name: Check if commit description is empty
+        id: check_empty_description
         run: |
           if [ -z "${{ env.COMMIT_DESCRIPTION }}" ]; then
-            echo "Commit description is empty. Exiting..."
-            exit 1
+            echo "description=true" >> $GITHUB_ENV
+          else
+            echo "description=false" >> $GITHUB_ENV
           fi
+
 
   build:
     runs-on: self-hosted
