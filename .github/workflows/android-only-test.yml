@@ -50,9 +50,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: true  # Fetch submodules: recursive
-          token: ${{ secrets.GIT_PERSONAL_TOKEN }}
 
       - name: Check commit message
         id: check_commit
