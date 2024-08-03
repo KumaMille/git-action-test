@@ -29,16 +29,16 @@ jobs:
           echo "Job1에서 설정된 값: ${{env.COMMIT_DESCRIPTION}}"
           echo "Job1에서 설정된 값: ${{env.COMMIT_MESSAGE}}"
 
-#  build:
-#    runs-on: self-hosted
-#    needs: check-description
-#    env:
-#      COMMIT_DESCRIPTION: ${{ vars.COMMIT_DESCRIPTION }}
-#    strategy:
-#      max-parallel: 5
-#      matrix:
-#        task:
-#          - assembleGoogleDistributionRelease
+  build:
+    runs-on: self-hosted
+    needs: check-description
+    env:
+      COMMIT_DESCRIPTION: ${{ vars.COMMIT_DESCRIPTION }}
+    strategy:
+      max-parallel: 5
+      matrix:
+        task:
+          - assembleGoogleDistributionRelease
 #          - assembleGoogleSandboxRelease
 #          - assembleGoogleQaRelease
 #          - assembleSamsungDistributionRelease
@@ -47,158 +47,158 @@ jobs:
 #          - assembleOnestoreDistributionRelease
 #          - assembleOnestoreSandboxRelease
 #          - assembleOnestoreQaRelease
-#
-#    steps:
-#      - uses: actions/checkout@v4
-#        with:
-#          submodules: true  # Fetch submodules: recursive
-#          token: ${{ secrets.GIT_PERSONAL_TOKEN }}
-#
-#      - name: Check commit message
-#        id: check_commit
-#        run: |
-#          echo "job1에서 설정된 값 ${{env.COMMIT_DESCRIPTION}}"
-#
-#          if git log -1 --pretty=%B | grep -q "description"; then
-#            echo "description=true" >> $GITHUB_ENV
-#          else
-#            echo "description=false" >> $GITHUB_ENV
-#          fi
-#
-#      - name: Set output for next workflow
-#        if: env.description == 'true'
-#        run: |
-#          echo "description=true" >> $GITHUB_ENV
-#
-#      - name: Record Start Time
-#        id: start_time
-#        run: echo "workflow_start_time=$(date +%s)" >> $GITHUB_ENV
-#
-#      - name: Set Build Number
-#        id: set_build_number
-#        run: echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
-#
-#
-#      - name: Set up JDK 17
-#        run: |
-#          export JAVA_HOME=/opt/homebrew/Cellar/openjdk@17/17.0.7/libexec/openjdk.jdk/Contents/Home
-#          export PATH=$JAVA_HOME/bin:$PATH
-#          echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
-#          echo "$JAVA_HOME/bin" >> $GITHUB_PATH
-#
-#      - name: Verify Java version
-#        run: java -version
-#
-#      - name: Grant Execute Permission For Gradlew
-#        run: chmod +x gradlew
-#
-#      - name: Create local.properties
-#        run: |
-#          echo "sdk.dir=$HOME/AndroidSDK" > $GITHUB_WORKSPACE/local.properties
-#      #
-#      #      - name: Clean Gradle Cache
-#      #        run: ./gradlew clean
-#
-#
-#      - name: Build release Apk
-#        run: ./gradlew ${{ matrix.task }} --stacktrace
-#
-#      - name: Find APK
-#        id: find_apk
-#        run: |
-#          BUILD_NUMBER=${{ env.BUILD_NUMBER }}
-#          TASK_NAME=${{ matrix.task }}
-#          APK_NAME=""
-#          APK_PATH=""
-#
-#          # Determine APK name and path based on task
-#          case $TASK_NAME in
-#            assembleGoogleDistributionRelease)
-#              APK_NAME="app-google-distribution-release-${BUILD_NUMBER}.apk"
-#              APK_PATH=$(find app/build/outputs/apk/googleDistribution/release/ -name "*.apk" | head -n 1)
-#              ;;
-#            assembleGoogleSandboxRelease)
-#              APK_NAME="app-google-sandbox-release-${BUILD_NUMBER}.apk"
-#              APK_PATH=$(find app/build/outputs/apk/googleSandbox/release/ -name "*.apk" | head -n 1)
-#              ;;
-#            assembleGoogleQaRelease)
-#              APK_NAME="app-google-qa-release-${BUILD_NUMBER}.apk"
-#              APK_PATH=$(find app/build/outputs/apk/googleQa/release/ -name "*.apk" | head -n 1)
-#              ;;
-#            assembleSamsungDistributionRelease)
-#              APK_NAME="app-samsung-distribution-release-${BUILD_NUMBER}.apk"
-#              APK_PATH=$(find app/build/outputs/apk/samsungDistribution/release/ -name "*.apk" | head -n 1)
-#              ;;
-#            assembleSamsungSandboxRelease)
-#              APK_NAME="app-samsung-sandbox-release-${BUILD_NUMBER}.apk"
-#              APK_PATH=$(find app/build/outputs/apk/samsungSandbox/release/ -name "*.apk" | head -n 1)
-#              ;;
-#            assembleSamsungQaRelease)
-#              APK_NAME="app-samsung-qa-release-${BUILD_NUMBER}.apk"
-#              APK_PATH=$(find app/build/outputs/apk/samsungQa/release/ -name "*.apk" | head -n 1)
-#              ;;
-#            assembleOnestoreDistributionRelease)
-#              APK_NAME="app-onestore-distribution-release-${BUILD_NUMBER}.apk"
-#              APK_PATH=$(find app/build/outputs/apk/onestoreDistribution/release/ -name "*.apk" | head -n 1)
-#              ;;
-#            assembleOnestoreSandboxRelease)
-#              APK_NAME="app-onestore-sandbox-release-${BUILD_NUMBER}.apk"
-#              APK_PATH=$(find app/build/outputs/apk/onestoreSandbox/release/ -name "*.apk" | head -n 1)
-#              ;;
-#            assembleOnestoreQaRelease)
-#              APK_NAME="app-onestore-qa-release-${BUILD_NUMBER}.apk"
-#              APK_PATH=$(find app/build/outputs/apk/onestoreQa/release/ -name "*.apk" | head -n 1)
-#              ;;
-#            *)
-#              echo "Unknown task: $TASK_NAME"
-#              exit 1
-#              ;;
-#          esac
-#
-#          if [ -z "$APK_PATH" ]; then
-#            echo "APK not found for task: $TASK_NAME"
-#            exit 1
-#          fi
-#
-#          NEW_APK_PATH="${APK_PATH%/*}/$APK_NAME"
-#          APK_DIR=$(dirname "$APK_PATH")
-#          mv $APK_PATH $NEW_APK_PATH
-#          echo "APK_PATH=$NEW_APK_PATH" >> $GITHUB_ENV
-#          echo "APK_NAME=$APK_NAME" >> $GITHUB_ENV
-#          echo "APK_DIR=$APK_DIR" >> $GITHUB_ENV
-#
-#      - name: Upload APK
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: ${{ env.APK_NAME }}
-#          path: ${{ env.APK_PATH }}
-#          retention-days: 3
-#
-#      - name: Delete APK
-#        run: |
-#          rm -f ${{ env.APK_PATH }}
-#
-#      - name: Record End time
-#        id: end_time
-#        run: echo "workflow_end_time=$(date +%s)" >> $GITHUB_ENV
-#
-#
-#      - name: Calculate Total Duration
-#        id: total_duration
-#        run: |
-#          workflow_start_time=${{ env.workflow_start_time }}
-#          workflow_end_time=${{ env.workflow_end_time }}
-#          total_duration=$((workflow_end_time - workflow_start_time))
-#          if [ $total_duration -lt 60 ]; then
-#            total_duration_formatted="${total_duration}초"
-#          else
-#            total_minutes=$((total_duration / 60))
-#            total_seconds=$((total_duration % 60))
-#            total_duration_formatted="${total_minutes}분 ${total_seconds}초"
-#          fi
-#          echo "Total duration: $total_duration_formatted"
-#          echo "total_duration_formatted=$total_duration_formatted" >> $GITHUB_ENV
-#
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true  # Fetch submodules: recursive
+          token: ${{ secrets.GIT_PERSONAL_TOKEN }}
+
+      - name: Check commit message
+        id: check_commit
+        run: |
+          echo "job1에서 설정된 값 ${{env.COMMIT_DESCRIPTION}}"
+
+          if git log -1 --pretty=%B | grep -q "description"; then
+            echo "description=true" >> $GITHUB_ENV
+          else
+            echo "description=false" >> $GITHUB_ENV
+          fi
+
+      - name: Set output for next workflow
+        if: env.description == 'true'
+        run: |
+          echo "description=true" >> $GITHUB_ENV
+
+      - name: Record Start Time
+        id: start_time
+        run: echo "workflow_start_time=$(date +%s)" >> $GITHUB_ENV
+
+      - name: Set Build Number
+        id: set_build_number
+        run: echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+
+
+      - name: Set up JDK 17
+        run: |
+          export JAVA_HOME=/opt/homebrew/Cellar/openjdk@17/17.0.7/libexec/openjdk.jdk/Contents/Home
+          export PATH=$JAVA_HOME/bin:$PATH
+          echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
+          echo "$JAVA_HOME/bin" >> $GITHUB_PATH
+
+      - name: Verify Java version
+        run: java -version
+
+      - name: Grant Execute Permission For Gradlew
+        run: chmod +x gradlew
+
+      - name: Create local.properties
+        run: |
+          echo "sdk.dir=$HOME/AndroidSDK" > $GITHUB_WORKSPACE/local.properties
+      #
+      #      - name: Clean Gradle Cache
+      #        run: ./gradlew clean
+
+
+      - name: Build release Apk
+        run: ./gradlew ${{ matrix.task }} --stacktrace
+
+      - name: Find APK
+        id: find_apk
+        run: |
+          BUILD_NUMBER=${{ env.BUILD_NUMBER }}
+          TASK_NAME=${{ matrix.task }}
+          APK_NAME=""
+          APK_PATH=""
+
+          # Determine APK name and path based on task
+          case $TASK_NAME in
+            assembleGoogleDistributionRelease)
+              APK_NAME="app-google-distribution-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/googleDistribution/release/ -name "*.apk" | head -n 1)
+              ;;
+            assembleGoogleSandboxRelease)
+              APK_NAME="app-google-sandbox-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/googleSandbox/release/ -name "*.apk" | head -n 1)
+              ;;
+            assembleGoogleQaRelease)
+              APK_NAME="app-google-qa-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/googleQa/release/ -name "*.apk" | head -n 1)
+              ;;
+            assembleSamsungDistributionRelease)
+              APK_NAME="app-samsung-distribution-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/samsungDistribution/release/ -name "*.apk" | head -n 1)
+              ;;
+            assembleSamsungSandboxRelease)
+              APK_NAME="app-samsung-sandbox-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/samsungSandbox/release/ -name "*.apk" | head -n 1)
+              ;;
+            assembleSamsungQaRelease)
+              APK_NAME="app-samsung-qa-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/samsungQa/release/ -name "*.apk" | head -n 1)
+              ;;
+            assembleOnestoreDistributionRelease)
+              APK_NAME="app-onestore-distribution-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/onestoreDistribution/release/ -name "*.apk" | head -n 1)
+              ;;
+            assembleOnestoreSandboxRelease)
+              APK_NAME="app-onestore-sandbox-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/onestoreSandbox/release/ -name "*.apk" | head -n 1)
+              ;;
+            assembleOnestoreQaRelease)
+              APK_NAME="app-onestore-qa-release-${BUILD_NUMBER}.apk"
+              APK_PATH=$(find app/build/outputs/apk/onestoreQa/release/ -name "*.apk" | head -n 1)
+              ;;
+            *)
+              echo "Unknown task: $TASK_NAME"
+              exit 1
+              ;;
+          esac
+
+          if [ -z "$APK_PATH" ]; then
+            echo "APK not found for task: $TASK_NAME"
+            exit 1
+          fi
+
+          NEW_APK_PATH="${APK_PATH%/*}/$APK_NAME"
+          APK_DIR=$(dirname "$APK_PATH")
+          mv $APK_PATH $NEW_APK_PATH
+          echo "APK_PATH=$NEW_APK_PATH" >> $GITHUB_ENV
+          echo "APK_NAME=$APK_NAME" >> $GITHUB_ENV
+          echo "APK_DIR=$APK_DIR" >> $GITHUB_ENV
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APK_NAME }}
+          path: ${{ env.APK_PATH }}
+          retention-days: 3
+
+      - name: Delete APK
+        run: |
+          rm -f ${{ env.APK_PATH }}
+
+      - name: Record End time
+        id: end_time
+        run: echo "workflow_end_time=$(date +%s)" >> $GITHUB_ENV
+
+
+      - name: Calculate Total Duration
+        id: total_duration
+        run: |
+          workflow_start_time=${{ env.workflow_start_time }}
+          workflow_end_time=${{ env.workflow_end_time }}
+          total_duration=$((workflow_end_time - workflow_start_time))
+          if [ $total_duration -lt 60 ]; then
+            total_duration_formatted="${total_duration}초"
+          else
+            total_minutes=$((total_duration / 60))
+            total_seconds=$((total_duration % 60))
+            total_duration_formatted="${total_minutes}분 ${total_seconds}초"
+          fi
+          echo "Total duration: $total_duration_formatted"
+          echo "total_duration_formatted=$total_duration_formatted" >> $GITHUB_ENV
+
 #  notify:
 #    runs-on: ubuntu-latest
 #    needs: build
