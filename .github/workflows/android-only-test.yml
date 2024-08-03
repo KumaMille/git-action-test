@@ -17,22 +17,22 @@ jobs:
 
       - name: Get Commit Description
         id: get_commit_description
-        run: echo "COMMIT_DESCRIPTION=$(git log -1 --pretty=%b)" >> $GITHUB_ENV
+        run: echo "COMMIT_DESCRIPTION=$(git log -1 --pretty=%b)" >> $GITHUB_OUTPUT
 
       - name: Check if commit description is empty
         id: check_empty_description
         run: |
           if [ -z "${{ env.COMMIT_DESCRIPTION }}" ]; then
-            echo "description=true" >> $GITHUB_ENV
+            echo "description=true" >> $GITHUB_OUTPUT
           else
-            echo "description=false" >> $GITHUB_ENV
+            echo "description=false" >> $GITHUB_OUTPUT
           fi
 
 
   build:
     runs-on: self-hosted
     needs: check-description
-    if: env.description == 'true'
+    if: needs.check-description.output.description == 'true'
     strategy:
       max-parallel: 5
       matrix:
