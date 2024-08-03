@@ -18,7 +18,7 @@ jobs:
       - name: Fetch Branch and Commit Messages
         id: fetch_info
         run: |
-           Extract branch name without prefix
+#           Extract branch name without prefix
 #          BRANCH_NAME=$(echo "${{ github.ref_name }}" | sed 's/^[^/]*\///')
 #          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
 
