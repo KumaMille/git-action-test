@@ -214,8 +214,21 @@ jobs:
           COMMIT_MESSAGE=$(git log -1 --pretty=%s ${{ github.sha }})
           COMMIT_DESCRIPTION=$(git log -1 --pretty=%b ${{ github.sha }})
 
+          # 멀티라인 커밋 설명을 Base64로 인코딩
+          ENCODED_COMMIT_DESCRIPTION=$(echo "$COMMIT_DESCRIPTION" | base64)
+
+          # 인코딩된 설명을 환경 변수에 저장
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
+          echo "ENCODED_COMMIT_DESCRIPTION=$ENCODED_COMMIT_DESCRIPTION" >> $GITHUB_ENV
+
+      - name: Decode Commit Description
+        id: decode_commit_desc
+        run: |
+          # Base64로 인코딩된 커밋 설명을 디코딩
+          COMMIT_DESCRIPTION=$(echo "${{ env.ENCODED_COMMIT_DESCRIPTION }}" | base64 --decode)          
           echo "::set-output name=commit_description::$COMMIT_DESCRIPTION"
+          
+
 
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
@@ -229,47 +242,46 @@ jobs:
                 {
                   "color": "${{ needs.build.result == 'success' && '#36a64f' || '#FF0000' }}",
                   "title": "AOS Release Build",
-                 "fields": [
+                  "fields": [
                     {
                       "title": "변경점",
                       "value": "`${{ env.COMMIT_MESSAGE }}`",
                       "short": false
-                  },
-                 {
+                    },
+                    {
                       "title": "커밋 설명",
-                      "value": "`${{ needs.build.outputs.commit_description }}`",
+                      "value": "`${{ steps.decode_commit_desc.outputs.commit_description }}`",
                       "short": false
                     },
-                  {
-                  "title": "다운로드 주소",
-                  "value": "<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}>",
-                  "short": false
-                  },
-                  {
-                     "title": "브랜치",
-                     "value": "`${{ env.BRANCH_NAME }}`",
-                     "short": true
-                   },
-                   {
-                     "title": "이벤트 이름",
-                     "value": "_${{github.event_name}}_",
-                     "short": true
-                   },
-                   {
-                     "title": "작성자",
-                     "value": "*${{ github.event.head_commit.author.name }}*",
-                     "short": true
-                   },
-                  {
-                    "title": "담당자",
-                    "value": "abc",
-                     "short": false
-                   }
-                 ],
+                    {
+                      "title": "다운로드 주소",
+                      "value": "<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}>",
+                      "short": false
+                    },
+                    {
+                      "title": "브랜치",
+                      "value": "`${{ env.BRANCH_NAME }}`",
+                      "short": true
+                    },
+                    {
+                      "title": "이벤트 이름",
+                      "value": "_${{ github.event_name }}_",
+                      "short": true
+                    },
+                    {
+                      "title": "작성자",
+                      "value": "*${{ github.event.head_commit.author.name }}*",
+                      "short": true
+                    },
+                    {
+                      "title": "담당자",
+                      "value": "abc",
+                      "short": false
+                    }
+                  ],
                   "footer": "Build Notification",
                   "footer_icon": "https://cdn-icons-png.flaticon.com/512/226/226770.png"
                 }
               ]
             }
-        if: ${{ needs.build.result == 'success'  }}
-
+        if: ${{ needs.build.result == 'success' && steps.decode_commit_desc.outputs.commit_description != '' }}
