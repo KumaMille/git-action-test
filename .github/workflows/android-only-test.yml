@@ -216,7 +216,6 @@ jobs:
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
           
           # Base64로 인코딩된 커밋 설명을 디코딩
-          COMMIT_DESCRIPTION=$(echo "${{ COMMIT_DESCRIPTION }}" )          
           echo "::set-output name=commit_description::$COMMIT_DESCRIPTION"          
 
 
