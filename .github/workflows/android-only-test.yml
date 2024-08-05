@@ -237,7 +237,7 @@ jobs:
                   },
                  {
                       "title": "커밋 설명",
-                      "value": "`${{ steps.outputs.commit_description }}`",
+                      "value": "`${{ needs.build.outputs.commit_description }}`",
                       "short": false
                     },
                   {
