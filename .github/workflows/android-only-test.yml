@@ -271,5 +271,5 @@ jobs:
                 }
               ]
             }
-        if: ${{ needs.build.result == 'success' && steps.outputs.commit_description != '' }}
+        if: ${{ needs.build.result == 'success'  }}
 
