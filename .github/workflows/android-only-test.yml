@@ -215,7 +215,7 @@ jobs:
           COMMIT_DESCRIPTION=$(git log -1 --pretty=%b ${{ github.sha }})
 
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
-          echo "::set-output name=commit_description::$COMMIT_DESCRIPTION
+          echo "::set-output name=commit_description::$COMMIT_DESCRIPTION"
 
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
