@@ -91,8 +91,8 @@ jobs:
         run: |
           echo "sdk.dir=$HOME/AndroidSDK" > $GITHUB_WORKSPACE/local.properties
 
-      - name: Clean Gradle Cache
-        run: ./gradlew clean
+#      - name: Clean Gradle Cache
+#        run: ./gradlew clean
 
       - name: Build release Apk
         run: ./gradlew ${{ matrix.task }} --stacktrace
