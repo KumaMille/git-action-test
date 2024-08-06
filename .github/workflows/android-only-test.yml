@@ -212,12 +212,10 @@ jobs:
           COMMIT_MESSAGE=$(git log -1 --pretty=%s ${{ github.sha }})
           COMMIT_DESCRIPTION=$(git log -1 --pretty=%b ${{ github.sha }})
 
-          # 멀티라인 커밋 설명을 Base64로 인코딩 (Slack 메시지에 사용하기 위함)
-          ENCODED_COMMIT_DESCRIPTION=$(echo "$COMMIT_DESCRIPTION" | base64)
-
-          # 인코딩된 설명을 환경 변수에 저장
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
-          echo "ENCODED_COMMIT_DESCRIPTION=$ENCODED_COMMIT_DESCRIPTION" >> $GITHUB_ENV
+          echo "COMMIT_DESCRIPTION<<EOF" >> $GITHUB_ENV
+          echo "$COMMIT_DESCRIPTION" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
 
       - name: Send Build Status Slack Msg
@@ -240,7 +238,7 @@ jobs:
                     },
                     {
                       "title": "커밋 설명",
-                      "value": $(echo "${{ env.COMMIT_DESCRIPTION_BASE64 }}" | base64 --decode),
+                      "value": "${{ env.COMMIT_DESCRIPTION}}",
                       "short": false
                     },
                     {
