@@ -240,7 +240,7 @@ jobs:
                     },
                     {
                       "title": "커밋 설명",
-                      "value": "`$(echo "${{ env.COMMIT_DESCRIPTION_BASE64 }}" | base64 --decode)`",
+                      "value": $(echo "${{ env.COMMIT_DESCRIPTION_BASE64 }}" | base64 --decode)",
                       "short": false
                     },
                     {
@@ -279,3 +279,4 @@ jobs:
                 }
               ]
             }
+        if: ${{ needs.build.result == 'success' }}
