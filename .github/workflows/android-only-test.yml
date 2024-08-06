@@ -213,9 +213,7 @@ jobs:
           COMMIT_DESCRIPTION=$(git log -1 --pretty=%b ${{ github.sha }})
 
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
-          echo "COMMIT_DESCRIPTION<<EOF" >> $GITHUB_ENV
-          echo "$COMMIT_DESCRIPTION" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          echo "COMMIT_DESCRIPTION=$(echo "COMMIT_DESCRIPTION" | tr '\n' '|' )" >> $GITHUB_ENV
 
 
       - name: Send Build Status Slack Msg
