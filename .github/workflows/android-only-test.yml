@@ -205,15 +205,23 @@ jobs:
       - name: Fetch Branch and Commit Messages
         id: fetch_info
         run: |
-          # Extract branch name without prefix
           BRANCH_NAME=$(echo "${{ github.ref_name }}" | sed 's/^[^/]*\///')
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
 
           COMMIT_MESSAGE=$(git log -1 --pretty=%s ${{ github.sha }})
           COMMIT_DESCRIPTION=$(git log -1 --pretty=%b ${{ github.sha }})
 
+          COMMIT_DESCRIPTION_BASE64=$(echo "$COMMIT_DESCRIPTION" | base64)
+
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
-          echo "commit_description=$COMMIT_DESCRIPTION" >> $GITHUB_OUTPUT
+          echo "COMMIT_DESCRIPTION_BASE64=$COMMIT_DESCRIPTION_BASE64" >> $GITHUB_ENV
+
+      - name: Decode Commit Description
+        id: decode_description
+        run: |
+          DECODED_DESCRIPTION=$(echo "${{ env.COMMIT_DESCRIPTION_BASE64 }}" | base64 --decode)
+          echo "decoded_description=$DECODED_DESCRIPTION" >> $GITHUB_ENV
+          echo "decoded_description=$DECODED_DESCRIPTION" >> $GITHUB_OUTPUT
 
 
       - name: Send Build Status Slack Msg
@@ -236,7 +244,7 @@ jobs:
                     },
                     {
                       "title": "커밋 설명",
-                      "value": "`${{ steps.fetch_info.outputs.commit_description }}`",
+                      "value": "`${{ steps.decode_description.outputs.decoded_description }}`",
                       "short": false
                     },
                     {
@@ -275,4 +283,4 @@ jobs:
                 }
               ]
             }
-        if: ${{ needs.build.result == 'success' && steps.fetch_info.outputs.commit_description != '' }}
+        if: ${{ needs.build.result == 'success' && steps.decode_description.outputs.decoded_description != '' }}
