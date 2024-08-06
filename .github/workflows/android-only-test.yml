@@ -211,10 +211,10 @@ jobs:
 
           COMMIT_MESSAGE=$(git log -1 --pretty=%s ${{ github.sha }})
           COMMIT_DESCRIPTION=$(git log -1 --pretty=%b ${{ github.sha }})
+          COMMIT_DESCRIPTION_ONE_LINE=$(echo "COMMIT_DESCRIPTION" | tr '\n' '|' )"
 
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
-          echo "COMMIT_DESCRIPTION=$(echo "COMMIT_DESCRIPTION" | tr '\n' '|' )" >> $GITHUB_ENV
-
+          echo "COMMIT_DESCRIPTION=COMMIT_DESCRIPTION_ONE_LINE" >> $GITHUB_ENV
 
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
