@@ -279,4 +279,3 @@ jobs:
                 }
               ]
             }
-        if: ${{ needs.build.result == 'success'}}
