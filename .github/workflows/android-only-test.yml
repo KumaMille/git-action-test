@@ -211,11 +211,11 @@ jobs:
 
           COMMIT_MESSAGE=$(git log -1 --pretty=%s ${{ github.sha }})
           COMMIT_DESCRIPTION=$(git log -1 --pretty=%b ${{ github.sha }})
+          
+          MODIFIED_COMMIT_DESCRIPTION=$(echo "$COMMIT_DESCRIPTION" | tr '\n' ' | ')
 
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
-          echo "COMMIT_DESCRIPTION<<EOF" >> $GITHUB_ENV
-          echo "$COMMIT_DESCRIPTION" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          echo "MODIFIED_COMMIT_DESCRIPTION=$MODIFIED_COMMIT_DESCRIPTION" >> $GITHUB_ENV
 
 
       - name: Send Build Status Slack Msg
@@ -238,7 +238,7 @@ jobs:
                     },
                     {
                       "title": "커밋 설명",
-                      "value": "`${{$(git log -1 --pretty=%b ${{ github.sha }})}}`",
+                      "value": "`${{ env.MODIFIED_COMMIT_DESCRIPTION }}`",
                       "short": false
                     },
                     {
