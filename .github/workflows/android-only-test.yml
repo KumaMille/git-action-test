@@ -238,7 +238,7 @@ jobs:
                     },
                     {
                       "title": "커밋 설명",
-                      "value": "`${{ env.COMMIT_DESCRIPTION }}`",
+                      "value": "`${{ $(git log -1 --pretty=%b ${{ github.sha }}) }}`",
                       "short": false
                     },
                     {
