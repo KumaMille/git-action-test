@@ -10,7 +10,7 @@ on:
 
 jobs:
   check-description:
-    runs-on: kuma-server
+    runs-on: [self-hosted, action-runner]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
