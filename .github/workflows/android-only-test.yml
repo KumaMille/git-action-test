@@ -279,4 +279,4 @@ jobs:
                 }
               ]
             }
-        if: ${{ needs.build.result == 'success' &&steps.decode_commit_desc.outputs.commit_description  != '' }}
+        if: ${{ needs.build.result == 'success'}}
