@@ -219,20 +219,6 @@ jobs:
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
           echo "ENCODED_COMMIT_DESCRIPTION=$ENCODED_COMMIT_DESCRIPTION" >> $GITHUB_ENV
 
-      - name: Decode Commit Description
-        id: decode_commit_desc
-        run: |
-          # Base64로 인코딩된 커밋 설명을 디코딩
-          COMMIT_DESCRIPTION=$(echo "${{ env.ENCODED_COMMIT_DESCRIPTION }}" | base64 --decode)          
-          echo "::set-output name=commit_description::$COMMIT_DESCRIPTION"
-
-      - name: Decode Commit Description
-        id: decode_description
-        run: |
-          DECODED_DESCRIPTION=$(echo "${{ env.COMMIT_DESCRIPTION_BASE64 }}" | base64 --decode)
-          echo "decoded_description=$DECODED_DESCRIPTION" >> $GITHUB_ENV
-          echo "decoded_description=$DECODED_DESCRIPTION" >> $GITHUB_OUTPUT
-
 
       - name: Send Build Status Slack Msg
         uses: 8398a7/action-slack@v3
@@ -254,7 +240,7 @@ jobs:
                     },
                     {
                       "title": "커밋 설명",
-                      "value": "`${{ steps.decode_commit_desc.outputs.commit_description  }}`",
+                      "value": "`$(echo "${{ env.COMMIT_DESCRIPTION_BASE64 }}" | base64 --decode)`",
                       "short": false
                     },
                     {
