@@ -211,9 +211,11 @@ jobs:
 
           COMMIT_MESSAGE=$(git log -1 --pretty=%s ${{ github.sha }})
           COMMIT_DESCRIPTION=$(git log -1 --pretty=%b ${{ github.sha }})
+          
+          COMMIT_DESCRIPTION_JSON=$(echo "$COMMIT_DESCRIPTION" | jq -R .)
 
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
-          echo "::set-output name=commit_description::$COMMIT_DESCRIPTION"
+          echo "COMMIT_DESCRIPTION_JSON=$COMMIT_DESCRIPTION_JSON" >> $GITHUB_ENV
           
 
 
@@ -237,7 +239,7 @@ jobs:
                     },
                     {
                       "title": "커밋 설명",
-                      "value": "`${{ steps.fetch_info.outputs.commit_description }}`",
+                      "value": ${{ env.COMMIT_DESCRIPTION_JSON }},
                       "short": false
                     },
                     {
@@ -276,4 +278,4 @@ jobs:
                 }
               ]
             }
-        if: ${{ needs.build.result == 'success' && steps.fetch_info.outputs.commit_description != '' }}
+        if: ${{ needs.build.result == 'success' && env.COMMIT_DESCRIPTION != '' }}
