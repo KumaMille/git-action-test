@@ -212,7 +212,7 @@ jobs:
           COMMIT_MESSAGE=$(git log -1 --pretty=%s ${{ github.sha }})
           COMMIT_DESCRIPTION=$(git log -1 --pretty=%b ${{ github.sha }})
           
-          MODIFIED_COMMIT_DESCRIPTION=$(echo "$COMMIT_DESCRIPTION" | tr '\n' '   ||   ')
+          MODIFIED_COMMIT_DESCRIPTION=$(echo "$COMMIT_DESCRIPTION" | tr '\n' ' *** ')
 
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
           echo "MODIFIED_COMMIT_DESCRIPTION=$MODIFIED_COMMIT_DESCRIPTION" >> $GITHUB_ENV
