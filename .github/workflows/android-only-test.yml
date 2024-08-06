@@ -238,7 +238,7 @@ jobs:
                     },
                     {
                       "title": "커밋 설명",
-                      "value": "`${{ env.EOF }}`",
+                      "value": "`${{ env.$COMMIT_DESCRIPTION }}`",
                       "short": false
                     },
                     {
