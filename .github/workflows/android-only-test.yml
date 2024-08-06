@@ -205,16 +205,26 @@ jobs:
       - name: Fetch Branch and Commit Messages
         id: fetch_info
         run: |
+          # Extract branch name without prefix
           BRANCH_NAME=$(echo "${{ github.ref_name }}" | sed 's/^[^/]*\///')
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
 
           COMMIT_MESSAGE=$(git log -1 --pretty=%s ${{ github.sha }})
           COMMIT_DESCRIPTION=$(git log -1 --pretty=%b ${{ github.sha }})
 
-          COMMIT_DESCRIPTION_BASE64=$(echo "$COMMIT_DESCRIPTION" | base64)
+          # 멀티라인 커밋 설명을 Base64로 인코딩 (Slack 메시지에 사용하기 위함)
+          ENCODED_COMMIT_DESCRIPTION=$(echo "$COMMIT_DESCRIPTION" | base64)
 
+          # 인코딩된 설명을 환경 변수에 저장
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
-          echo "COMMIT_DESCRIPTION_BASE64=$COMMIT_DESCRIPTION_BASE64" >> $GITHUB_ENV
+          echo "ENCODED_COMMIT_DESCRIPTION=$ENCODED_COMMIT_DESCRIPTION" >> $GITHUB_ENV
+
+      - name: Decode Commit Description
+        id: decode_commit_desc
+        run: |
+          # Base64로 인코딩된 커밋 설명을 디코딩
+          COMMIT_DESCRIPTION=$(echo "${{ env.ENCODED_COMMIT_DESCRIPTION }}" | base64 --decode)          
+          echo "::set-output name=commit_description::$COMMIT_DESCRIPTION"
 
       - name: Decode Commit Description
         id: decode_description
@@ -244,7 +254,7 @@ jobs:
                     },
                     {
                       "title": "커밋 설명",
-                      "value": "`${{ steps.decode_description.outputs.decoded_description }}`",
+                      "value": "`${{ steps.decode_commit_desc.outputs.commit_description  }}`",
                       "short": false
                     },
                     {
@@ -283,4 +293,4 @@ jobs:
                 }
               ]
             }
-        if: ${{ needs.build.result == 'success' && steps.decode_description.outputs.decoded_description != '' }}
+        if: ${{ needs.build.result == 'success' &&steps.decode_commit_desc.outputs.commit_description  != '' }}
